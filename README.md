@@ -41,7 +41,6 @@ import modernErrorsSerialize from 'modern-errors-serialize'
 
 export const AnyError = modernErrors([modernErrorsSerialize])
 // ...
-export const InputError = AnyError.subclass('InputError')
 ```
 
 [Serializing](#errortojson) errors to plain objects.
