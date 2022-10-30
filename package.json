@@ -49,9 +49,15 @@
     "lib": "src",
     "test": "test"
   },
-  "dependencies": {},
+  "dependencies": {
+    "error-serializer": "^3.5.1",
+    "is-error-instance": "^1.1.0"
+  },
   "devDependencies": {
     "@ehmicky/dev-tasks": "^1.0.98"
+  },
+  "peerDependencies": {
+    "modern-errors": "^4.0.0-beta.3"
   },
   "engines": {
     "node": ">=14.18.0"
