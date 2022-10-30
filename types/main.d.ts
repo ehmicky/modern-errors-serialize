@@ -35,8 +35,8 @@ declare const plugin: {
   }
   staticMethods: {
     /**
-     * `AnyError.parse(errorObject)` converts error plain objects back to
-     * identical error instances. The original error class is preserved.
+     * Converts an error plain object back to an identical error instance.
+     * The original error class is preserved.
      *
      * @example
      * ```js
