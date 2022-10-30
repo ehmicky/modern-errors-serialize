@@ -186,6 +186,8 @@ Error classes with a `custom` preserve any arguments passed to their
 - Forwarded as is to `super()`
 - JSON-serializable
 
+<!-- eslint-disable fp/no-this, fp/no-mutation -->
+
 ```js
 const InputError = AnyError.subclass('InputError', {
   custom: class extends AnyError {
