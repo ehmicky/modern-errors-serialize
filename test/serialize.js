@@ -6,7 +6,7 @@ import {
   testError,
   errorObject,
   nativeError,
-} from '../../helpers/serialize.js'
+} from './helpers/main.js'
 
 const convertError = function ({ name, message, stack, one }) {
   return { name, message, stack, one }

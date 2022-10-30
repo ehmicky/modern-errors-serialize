@@ -1,6 +1,6 @@
 import test from 'ava'
 
-import { AnyError, UnknownError } from '../../helpers/serialize.js'
+import { AnyError, UnknownError } from './helpers/main.js'
 
 test('AnyError.parse() handles constructors that throw', (t) => {
   const InvalidError = AnyError.subclass('InvalidError', {

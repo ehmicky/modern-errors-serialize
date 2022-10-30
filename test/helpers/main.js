@@ -1,13 +1,11 @@
 import { runInNewContext } from 'vm'
 
-// eslint-disable-next-line no-restricted-imports
-import SERIALIZE_PLUGIN from '../../src/core_plugins/serialize.js'
+import modernErrors from 'modern-errors'
+import modernErrorsSerialize from 'modern-errors-serialize'
 
-import { defineClassOpts } from './main.js'
-
-export const { TestError, AnyError, UnknownError } = defineClassOpts({}, {}, [
-  SERIALIZE_PLUGIN,
-])
+export const AnyError = modernErrors([modernErrorsSerialize])
+export const UnknownError = AnyError.subclass('UnknownError')
+export const TestError = AnyError.subclass('TestError')
 
 export const testError = new TestError('message')
 // eslint-disable-next-line fp/no-mutation

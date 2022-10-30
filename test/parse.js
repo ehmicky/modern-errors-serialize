@@ -10,7 +10,7 @@ import {
   nativeError,
   nativeErrorObject,
   crossRealmError,
-} from '../../helpers/serialize.js'
+} from './helpers/main.js'
 
 test('AnyError.parse() parses error plain objects', (t) => {
   t.deepEqual(AnyError.parse(errorObject), testError)
