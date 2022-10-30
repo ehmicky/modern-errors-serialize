@@ -21,7 +21,7 @@ to/from plain objects.
 - [Deep serialization/parsing](#deep-serializationparsing)
 - [Custom serialization/parsing](#custom-serializationparsing) (e.g. YAML or
   `process.send()`)
-- Keeps error classes
+- Keeps [error classes](#anyerrorparseerrorobject)
 - Preserves errors' [additional properties](#additional-error-properties)
 - Can keep `custom` [constructor's arguments](#constructors-arguments)
 - Works [recursively](#aggregate-errors) with
@@ -34,12 +34,12 @@ to/from plain objects.
 [`modern-errors`](https://github.com/ehmicky/modern-errors).
 
 ```js
-// `errors.js`
 import modernErrors from 'modern-errors'
 import modernErrorsSerialize from 'modern-errors-serialize'
 
 export const AnyError = modernErrors([modernErrorsSerialize])
 // ...
+export const InputError = AnyError.subclass('InputError')
 ```
 
 Serializing errors to plain objects.
@@ -88,7 +88,7 @@ _Return value_: `ErrorObject`
 Converts errors to plain objects that are
 [serializable](https://github.com/ehmicky/error-serializer#json-safety) to JSON
 ([or YAML](https://github.com/ehmicky/error-serializer#custom-serializationparsing),
-etc.). It is
+etc.). This is
 [automatically called](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior)
 by `JSON.stringify()`. All error properties
 [are kept](https://github.com/ehmicky/error-serializer#additional-error-properties).
@@ -109,7 +109,7 @@ Error plain objects are always
 [safe to serialize with JSON](https://github.com/ehmicky/safe-json-value).
 
 ```js
-const error = new InputError('example')
+const error = new InputError('Wrong file.')
 error.cycle = error
 
 // Cycles make `JSON.stringify()` throw, so they are removed
@@ -140,20 +140,20 @@ serialization/parsing logic to be performed.
 ```js
 import { dump, load } from 'js-yaml'
 
-const error = new InputError('example')
+const error = new InputError('Wrong file.')
 const errorObject = error.toJSON()
 const errorYamlString = dump(errorObject)
 // name: InputError
-// message: example
-// stack: InputError: example ...
+// message: Wrong file.
+// stack: InputError: Wrong file. ...
 const newErrorObject = load(errorYamlString)
-const newError = AnyError.parse(newErrorObject) // InputError: example
+const newError = AnyError.parse(newErrorObject) // InputError: Wrong file.
 ```
 
 ## Additional error properties
 
 ```js
-const error = new InputError('example', { props: { prop: true } })
+const error = new InputError('Wrong file.', { props: { prop: true } })
 const errorObject = error.toJSON()
 console.log(errorObject.prop) // true
 const newError = AnyError.parse(errorObject)
@@ -163,28 +163,30 @@ console.log(newError.prop) // true
 ## Aggregate `errors`
 
 ```js
-const error = new InputError('four', {
-  errors: [new InputError('one'), new InputError('two')],
+const error = new InputError('Wrong file.', {
+  errors: [new ExampleError('one'), new ExampleError('two')],
 })
 
 const errorObject = error.toJSON()
 // {
 //   name: 'InputError',
-//   message: 'four',
+//   message: 'Wrong file.',
 //   stack: '...',
-//   errors: [{ name: 'InputError', message: 'one', stack: '...' }, ...],
+//   errors: [{ name: 'ExampleError', message: 'one', stack: '...' }, ...],
 // }
 const newError = AnyError.parse(errorObject)
-// InputError: four
-//   [errors]: [InputError: one, InputError: two]
+// InputError: Wrong file.
+//   [errors]: [ExampleError: one, ExampleError: two]
 ```
 
 ## Constructor's arguments
 
-Error classes with a `custom` preserve any arguments passed to their
-`constructor` providing those are both:
+Error classes with a
+[`custom` option](https://github.com/ehmicky/modern-errors#custom-logic)
+preserve any arguments passed to their `constructor` providing those are both:
 
-- Forwarded as is to `super()`
+- Forwarded as is to
+  [`super(...)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/super)
 - JSON-serializable
 
 <!-- eslint-disable fp/no-this, fp/no-mutation -->
@@ -199,10 +201,10 @@ const InputError = AnyError.subclass('InputError', {
   },
 })
 
-const error = new InputError('example', {}, true)
+const error = new InputError('Wrong file.', {}, true)
 const errorObject = error.toJSON()
 
-// This calls `new InputError('example', {}, true)`
+// This calls `new InputError('Wrong file.', {}, true)`
 const newError = AnyError.parse(errorObject)
 ```
 

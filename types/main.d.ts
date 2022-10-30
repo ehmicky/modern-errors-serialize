@@ -18,7 +18,7 @@ declare const plugin: {
      * [serializable](https://github.com/ehmicky/error-serializer#json-safety)
      * to JSON
      * ([or YAML](https://github.com/ehmicky/error-serializer#custom-serializationparsing),
-     * etc.). It is
+     * etc.). This is
      * [automatically called](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior)
      * by `JSON.stringify()`. All error properties
      * [are kept](https://github.com/ehmicky/error-serializer#additional-error-properties).
