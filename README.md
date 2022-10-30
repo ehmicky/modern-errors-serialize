@@ -42,7 +42,7 @@ export const AnyError = modernErrors([modernErrorsSerialize])
 export const InputError = AnyError.subclass('InputError')
 ```
 
-Serializing errors to plain objects.
+[Serializing](#errortojson) errors to plain objects.
 
 ```js
 const error = new InputError('Wrong file.', { props: { filePath } })
@@ -52,7 +52,7 @@ const errorString = JSON.stringify(error)
 // '{"name":"InputError",...}'
 ```
 
-Parsing errors from plain objects.
+[Parsing](#anyerrorparseerrorobject) errors from plain objects.
 
 ```js
 const newErrorObject = JSON.parse(errorString)
@@ -183,11 +183,11 @@ const newError = AnyError.parse(errorObject)
 
 Error classes with a
 [`custom` option](https://github.com/ehmicky/modern-errors#custom-logic)
-preserve any arguments passed to their `constructor` providing those are both:
+preserve any arguments passed to their `constructor()` providing those are both:
 
 - Forwarded as is to
   [`super(...)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/super)
-- JSON-serializable
+- Serializable with JSON
 
 <!-- eslint-disable fp/no-this, fp/no-mutation -->
 
