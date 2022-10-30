@@ -9,7 +9,9 @@
 [![Twitter](https://img.shields.io/badge/%E2%80%8B-twitter-brightgreen.svg?logo=twitter)](https://twitter.com/intent/follow?screen_name=ehmicky)
 [![Medium](https://img.shields.io/badge/%E2%80%8B-medium-brightgreen.svg?logo=medium)](https://medium.com/@ehmicky)
 
-`modern-errors` plugin to serialize/parse errors.
+[`modern-errors`](https://github.com/ehmicky/modern-errors)
+[plugin](https://github.com/ehmicky/modern-errors#plugins-1) to serialize/parse
+errors.
 
 This adds [`error.toJSON()`](#errortojson) and
 [`AnyError.parse()`](#anyerrorparseerrorobject) to serialize/parse errors
