@@ -10,7 +10,6 @@ const parse = function ({ ErrorClasses, AnyError }, errorObject) {
   return isErrorInstance(value) ? AnyError.normalize(value) : value
 }
 
-// eslint-disable-next-line import/no-default-export
 export default {
   name: 'serialize',
   instanceMethods: { toJSON },
