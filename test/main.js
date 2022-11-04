@@ -1,6 +1,6 @@
 import test from 'ava'
-import templateName from 'template-name'
+import modernErrorsSerialize from 'modern-errors-serialize'
 
 test('Dummy test', (t) => {
-  t.true(templateName(true))
+  t.true(modernErrorsSerialize(true))
 })
