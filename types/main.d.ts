@@ -7,7 +7,8 @@ export type { ErrorObject }
 /**
  * `modern-errors-serialize` plugin.
  *
- * This plugin allows serializing and parsing errors to JSON.
+ * This plugin adds `error.toJSON()` and `AnyError.parse()` to serialize/parse
+ * errors to plain objects.
  */
 declare const plugin: {
   name: 'serialize'

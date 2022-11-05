@@ -11,19 +11,20 @@
 
 `modern-errors` plugin to serialize/parse errors.
 
-This adds `error.toJSON()` and `AnyError.parse()` to serialize/parse errors to
-plain objects.
+This adds [`error.toJSON()`](#errortojson) and
+[`AnyError.parse()`](#anyerrorparseerrorobject) to serialize/parse errors
+to/from plain objects.
 
 # Features
 
 - Ensures errors are [safe to serialize with JSON](#json-safety)
-- [Deep serialization/parsing](#deepserializationparsing)
+- [Deep serialization/parsing](#deep-serializationparsing)
 - [Custom serialization/parsing](#custom-serializationparsing) (e.g. YAML or
   `process.send()`)
 - Keeps error classes
 - Preserves errors' [additional properties](#additional-error-properties)
 - Can keep `custom` [constructor's arguments](#constructors-arguments)
-- Works [recursively](#errorcause-and-aggregateerror) with
+- Works [recursively](#aggregate-errors) with
   [`AggregateError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AggregateError)
 - Safe: this never throws
 
@@ -41,7 +42,7 @@ export const AnyError = modernErrors([modernErrorsSerialize])
 // ...
 ```
 
-...
+Serializing errors to plain objects.
 
 ```js
 const error = new InputError('Wrong file.', { props: { filePath } })
@@ -51,7 +52,7 @@ const errorString = JSON.stringify(error)
 // '{"name":"InputError",...}'
 ```
 
-...
+Parsing errors from plain objects.
 
 ```js
 const newErrorObject = JSON.parse(errorString)
