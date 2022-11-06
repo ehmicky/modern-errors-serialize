@@ -50,7 +50,7 @@
     "test": "test"
   },
   "dependencies": {
-    "error-serializer": "^3.5.1",
+    "error-serializer": "^3.6.0",
     "is-error-instance": "^1.2.0"
   },
   "devDependencies": {
