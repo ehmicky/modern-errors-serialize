@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "error-serializer": "^3.5.1",
-    "is-error-instance": "^1.1.0"
+    "is-error-instance": "^1.2.0"
   },
   "devDependencies": {
     "@ehmicky/dev-tasks": "^1.0.99",
