@@ -10,7 +10,7 @@
 [![Medium](https://img.shields.io/badge/%E2%80%8B-medium-brightgreen.svg?logo=medium)](https://medium.com/@ehmicky)
 
 [`modern-errors`](https://github.com/ehmicky/modern-errors)
-[plugin](https://github.com/ehmicky/modern-errors#plugins-1) to serialize/parse
+[plugin](https://github.com/ehmicky/modern-errors#-plugins) to serialize/parse
 errors.
 
 This adds [`error.toJSON()`](#errortojson) and
@@ -183,7 +183,7 @@ const newError = AnyError.parse(errorObject)
 ## Constructor's arguments
 
 Error classes with a
-[`custom` option](https://github.com/ehmicky/modern-errors#custom-logic)
+[`custom` option](https://github.com/ehmicky/modern-errors#-custom-logic)
 preserve any arguments passed to their `constructor()` providing those are both:
 
 - Forwarded as is to
