@@ -1,4 +1,4 @@
-import { runInNewContext } from 'vm'
+import { runInNewContext } from 'node:vm'
 
 import modernErrors from 'modern-errors'
 import modernErrorsSerialize from 'modern-errors-serialize'
