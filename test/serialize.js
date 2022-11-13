@@ -48,6 +48,12 @@ each([baseError, nativeError], ({ title }, deepError) => {
   const error = new BaseError('test')
   error.prop = [deepError]
 
+  const shallowError = new BaseError('test', {
+    serialize: { shallow: true },
+  })
+  // eslint-disable-next-line fp/no-mutation
+  shallowError.prop = [deepError]
+
   test(`ErrorClass.serialize() is deep by default | ${title}`, (t) => {
     t.deepEqual(BaseError.serialize(error).prop[0], convertError(deepError))
   })
@@ -60,23 +66,13 @@ each([baseError, nativeError], ({ title }, deepError) => {
   })
 
   test(`ErrorClass.serialize() uses instance options | ${title}`, (t) => {
-    const shallowError = new BaseError('', {
-      serialize: { shallow: true },
-      cause: error,
-    })
-
     t.deepEqual(BaseError.serialize(shallowError).prop[0], deepError)
   })
 
   test(`ErrorClass.serialize() uses method options over instance options | ${title}`, (t) => {
-    const shallowError = new BaseError('', {
-      serialize: { shallow: false },
-      cause: error,
-    })
-
     t.deepEqual(
-      BaseError.serialize(shallowError, { shallow: true }).prop[0],
-      deepError,
+      BaseError.serialize(shallowError, { shallow: false }).prop[0],
+      convertError(deepError),
     )
   })
 
