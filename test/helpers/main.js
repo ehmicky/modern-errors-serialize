@@ -32,10 +32,10 @@ export const PluginError = BaseError.subclass('PluginError', {
   plugins: [testPlugin],
 })
 export const pluginError = new PluginError('message', { test: true })
-
-export const getPluginErrorObject = function (methodName) {
-  return excludeKeys(PluginError[methodName](pluginError), ['options'])
-}
+export const pluginErrorObject = excludeKeys(
+  PluginError.serialize(pluginError),
+  ['options'],
+)
 
 export const nonErrorObjects = [
   undefined,
