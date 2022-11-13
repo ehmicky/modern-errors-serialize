@@ -1,22 +1,7 @@
 import test from 'ava'
-import { excludeKeys } from 'filter-obj'
 import { each } from 'test-each'
 
-import { BaseError } from './helpers/main.js'
-
-const testPlugin = {
-  name: 'test',
-  getOptions(options) {
-    return options
-  },
-  properties({ options }) {
-    return { options }
-  },
-}
-
-const PluginError = BaseError.subclass('PluginError', { plugins: [testPlugin] })
-const pluginError = new PluginError('message', { test: true })
-const pluginErrorObject = excludeKeys(pluginError.toJSON(), ['options'])
+import { PluginError, pluginError, pluginErrorObject } from './helpers/main.js'
 
 test('Serialization keeps plugin options', (t) => {
   t.true(pluginErrorObject.pluginsOpts.test)

@@ -1,3 +1,4 @@
+import { excludeKeys } from 'filter-obj'
 import ModernError from 'modern-errors'
 import modernErrorsSerialize from 'modern-errors-serialize'
 
@@ -18,3 +19,19 @@ const parentNativeError = new BaseError('test')
 // eslint-disable-next-line fp/no-mutation
 parentNativeError.prop = nativeError
 export const nativeErrorObject = parentNativeError.toJSON().prop
+
+const testPlugin = {
+  name: 'test',
+  getOptions(options) {
+    return options
+  },
+  properties({ options }) {
+    return { options }
+  },
+}
+
+export const PluginError = BaseError.subclass('PluginError', {
+  plugins: [testPlugin],
+})
+export const pluginError = new PluginError('message', { test: true })
+export const pluginErrorObject = excludeKeys(pluginError.toJSON(), ['options'])
