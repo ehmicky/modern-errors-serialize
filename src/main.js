@@ -1,22 +1,36 @@
 import {
+  validateOptions,
   serialize as serializeToObject,
   parse as parseFromObject,
 } from 'error-serializer'
+import isErrorInstance from 'is-error-instance'
 import isPlainObject from 'is-plain-obj'
 
-// `ErrorClass.serialize(value)`
-const serialize = function ({ instancesData }, value) {
-  return serializeValue(value, instancesData)
+// Retrieve options
+const getOptions = function (options = {}) {
+  validateOptions(options)
+  const { loose, shallow, ...unknownOptions } = options
+  validateUnknownOptions(unknownOptions)
+  return { loose, shallow }
 }
 
-// `ErrorClass.toJSON(error)` or `error.toJSON()`
-const toJSON = function ({ error, instancesData }) {
-  return serializeValue(error, instancesData)
+const validateUnknownOptions = function (unknownOptions) {
+  const [unknownOption] = Object.keys(unknownOptions)
+
+  if (unknownOption !== undefined) {
+    throw new TypeError(`Option "${unknownOption}" is unknown.`)
+  }
 }
 
-const serializeValue = function (value, instancesData) {
-  return serializeToObject(value, {
-    loose: true,
+// `ErrorClass.serialize(value)` or `error.toJSON()`
+const serialize = function (
+  { ErrorClass, instancesData, options: { loose, shallow } },
+  value,
+) {
+  const valueA = applyLoose(value, loose, ErrorClass)
+  return serializeToObject(valueA, {
+    loose,
+    shallow,
     beforeSerialize: beforeSerialize.bind(undefined, instancesData),
     afterSerialize,
   })
@@ -56,36 +70,18 @@ const afterSerialize = function (error) {
 }
 
 // `ErrorClass.parse(value)`
-const parse = function ({ ErrorClass, ErrorClasses, instancesData }, value) {
-  return parseValue({ ErrorClass, ErrorClasses, instancesData, value })
-}
-
-// `ErrorClass.fromJSON(errorObject)`
-const fromJSON = function (
-  { ErrorClass, ErrorClasses, instancesData },
-  errorObject,
-) {
-  const error = parseValue({
-    ErrorClass,
-    ErrorClasses,
-    instancesData,
-    value: errorObject,
-  })
-  return ErrorClass.normalize(error)
-}
-
-const parseValue = function ({
-  ErrorClass,
-  ErrorClasses,
-  instancesData,
+const parse = function (
+  { ErrorClass, ErrorClasses, instancesData, options: { loose, shallow } },
   value,
-}) {
+) {
   const classes = getClasses(ErrorClasses)
-  return parseFromObject(value, {
-    loose: true,
+  const valueA = parseFromObject(value, {
+    loose,
+    shallow,
     classes,
     afterParse: afterParse.bind(undefined, { ErrorClass, instancesData }),
   })
+  return applyLoose(valueA, loose, ErrorClass)
 }
 
 const getClasses = function (ErrorClasses) {
@@ -115,8 +111,13 @@ const setPluginsOpts = function (ErrorClass, instancesData, error) {
   instancesData.set(error, { pluginsOpts })
 }
 
+const applyLoose = function (value, loose, ErrorClass) {
+  return loose || isErrorInstance(value) ? value : ErrorClass.normalize(value)
+}
+
 export default {
   name: 'serialize',
-  instanceMethods: { toJSON },
-  staticMethods: { serialize, parse, fromJSON },
+  getOptions,
+  staticMethods: { serialize, parse },
+  instanceMethods: { toJSON: serialize },
 }
