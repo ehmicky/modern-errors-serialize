@@ -50,6 +50,7 @@ export const BaseError = ModernError.subclass('BaseError', {
 
 ```js
 const error = new ExampleError('message', { props: { filePath } })
+
 const errorObject = BaseError.serialize(error)
 // { name: 'ExampleError', message: 'message', stack: '...', filePath: '...' }
 const errorString = JSON.stringify(errorObject)
@@ -105,7 +106,9 @@ also preserved.
 _Return value_: `ErrorInstance`
 
 Converts `errorObject` to an error instance. The original error classes are
-preserved.
+preserved providing they are
+[subclasses](https://github.com/ehmicky/modern-errors#create-error-classes) of
+`BaseError`.
 
 ## Options
 
@@ -138,8 +141,9 @@ BaseError.parse(errorObject, { shallow: true }).inner // { name: '...', ... }
 _Type_: `boolean`\
 _Default_: `false`
 
-By default, when the argument is not an `Error` instance or error plain object,
-it is converted to one. If this option is `true`, it is kept as is instead.
+By default, when the argument is not an `Error` instance or an error plain
+object, it is converted to one. If this option is `true`, it is kept as is
+instead.
 
 ```js
 BaseError.serialize('example') // { name: 'BaseError', message: 'example', ... }
