@@ -50,28 +50,22 @@ test('ErrorClass.parse() keeps plugin options deeply', (t) => {
   t.true(new PluginError('', { cause }).options)
 })
 
+const deepErrorObject = { ...pluginErrorObject, prop: [baseErrorObject] }
+
 test('ErrorClass.parse() is deep by default', (t) => {
-  t.deepEqual(
-    BaseError.parse({ ...pluginErrorObject, prop: [baseErrorObject] }).prop[0],
-    baseError,
-  )
+  t.deepEqual(BaseError.parse(deepErrorObject).prop[0], baseError)
 })
 
 test('ErrorClass.parse() is not deep with "shallow: true"', (t) => {
   t.deepEqual(
-    BaseError.parse(
-      { ...pluginErrorObject, prop: [baseErrorObject] },
-      { shallow: true },
-    ).prop[0],
+    BaseError.parse(deepErrorObject, { shallow: true }).prop[0],
     baseErrorObject,
   )
 })
 
 test('ErrorClass.parse() can be deep and loose', (t) => {
   t.deepEqual(
-    BaseError.parse([{ ...pluginErrorObject, prop: [baseErrorObject] }], {
-      loose: true,
-    })[0].prop[0],
+    BaseError.parse([deepErrorObject], { loose: true })[0].prop[0],
     baseError,
   )
 })
