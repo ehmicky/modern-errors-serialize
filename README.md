@@ -99,14 +99,15 @@ etc.). This is
 [automatically called](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior)
 by `JSON.stringify()`.
 
-All error properties
-[are kept](https://github.com/ehmicky/error-serializer#additional-error-properties).
+All
+[error properties](https://github.com/ehmicky/error-serializer#additional-error-properties)
+are kept.
 [Plugin options](https://github.com/ehmicky/modern-errors#plugin-options) are
 also preserved.
 
 ## BaseError.parse(value)
 
-If `value` is an error plain object, converts it to an identical error instance.
+If `value` is an error plain object, converts it to an error instance.
 Otherwise, [recurse](#deep-serializationparsing) over `value` and parse any
 nested error plain object.
 
@@ -193,7 +194,7 @@ const newError = BaseError.parse(errorObject)
 ## Constructors
 
 If an error with a
-[`custom` class](https://github.com/ehmicky/modern-errors#-custom-logic), is
+[`custom` class](https://github.com/ehmicky/modern-errors#-custom-logic) is
 parsed, its custom constructor is not called. However, any property previously
 set by that constructor is still preserved, providing it is serializable and
 enumerable.
@@ -212,7 +213,9 @@ const InputError = BaseError.subclass('InputError', {
 
 const error = new InputError('Wrong file.', {}, true)
 const errorObject = error.toJSON()
+// `constructor(message, options, prop)` is not called
 const newError = BaseError.parse(errorObject)
+// But properties set by that `constructor(...)` are kept
 console.log(newError.prop) // true
 ```
 
