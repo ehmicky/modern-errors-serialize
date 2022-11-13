@@ -7,6 +7,10 @@
 - [`BaseError.parse(value)`](README.md#baseerrorparseerrorobject) is now deep by
   default. If `value` is not an error object, it is not converted to one
   anymore.
+- The serialization format has changed: instead of serializing the constructor
+  arguments as `constructorArgs`, the plugins options are now serialized as
+  `pluginsOpts`. Those properties are undocumented and mostly internal, so this
+  should not have any impact in most cases.
 
 # 1.4.0
 
