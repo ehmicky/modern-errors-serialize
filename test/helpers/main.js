@@ -9,14 +9,16 @@ export const BaseError = ModernError.subclass('BaseError', {
 export const baseError = new BaseError('message')
 // eslint-disable-next-line fp/no-mutation
 baseError.one = true
+export const baseErrorObject = BaseError.serialize(baseError)
 
 export const nativeError = new TypeError('message')
 // eslint-disable-next-line fp/no-mutation
 nativeError.one = true
 
-export const parentNativeError = new BaseError('test')
+const parentNativeError = new BaseError('test')
 // eslint-disable-next-line fp/no-mutation
 parentNativeError.prop = nativeError
+export const nativeErrorObject = BaseError.serialize(parentNativeError).prop
 
 const testPlugin = {
   name: 'test',

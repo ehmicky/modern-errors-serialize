@@ -4,37 +4,39 @@ import { each } from 'test-each'
 import {
   BaseError,
   baseError,
+  baseErrorObject,
   nativeError,
-  parentNativeError,
+  nativeErrorObject,
   PluginError,
   pluginErrorObject,
   nonErrorObjects,
   InvalidError,
 } from './helpers/main.js'
 
-test('ErrorClass.parse() parse error plain objects', (t) => {
-  t.deepEqual(BaseError.parse(BaseError.toJSON(baseError)), baseError)
+test('ErrorClass.parse() parses error plain objects', (t) => {
+  t.deepEqual(BaseError.parse(baseErrorObject), baseError)
 })
 
-test('ErrorClass.parse() keep error class', (t) => {
-  t.is(BaseError.parse(BaseError.toJSON(baseError)).constructor, BaseError)
+test('ErrorClass.parse() keeps error class', (t) => {
+  t.is(BaseError.parse(baseErrorObject).constructor, BaseError)
 })
 
-test('ErrorClass.parse() parse native errors', (t) => {
-  const nativeErrorObject = BaseError.toJSON(parentNativeError).prop
-  const [nativeErrorCopy] = BaseError.parse([nativeErrorObject])
+test('ErrorClass.parse() parses deep native errors', (t) => {
+  const [nativeErrorCopy] = BaseError.parse([nativeErrorObject], {
+    loose: true,
+  })
   t.deepEqual(nativeErrorCopy, nativeError)
   t.is(nativeErrorCopy.constructor, TypeError)
 })
 
-test('ErrorClass.parse() handle constructors that throw', (t) => {
+test('ErrorClass.parse() handles constructors that throw', (t) => {
   const invalidError = new InvalidError('message', {}, Symbol('test'))
   t.true(
-    BaseError.parse(InvalidError.toJSON(invalidError)) instanceof BaseError,
+    BaseError.parse(InvalidError.serialize(invalidError)) instanceof BaseError,
   )
 })
 
-test('ErrorClass.parse() keep plugin options', (t) => {
+test('ErrorClass.parse() keeps plugin options', (t) => {
   const cause = PluginError.parse(pluginErrorObject)
   t.false('pluginsOpts' in cause)
   t.true(new PluginError('', { cause }).options)
@@ -48,13 +50,20 @@ test('ErrorClass.parse() keeps plugin options deeply', (t) => {
   t.true(new PluginError('', { cause }).options)
 })
 
-test('ErrorClass.parse() is deep', (t) => {
+test('ErrorClass.parse() is deep by default', (t) => {
   t.deepEqual(
-    BaseError.parse({
-      ...pluginErrorObject(),
-      prop: [BaseError.toJSON(baseError)],
-    }).prop[0],
+    BaseError.parse({ ...pluginErrorObject, prop: [baseErrorObject] }).prop[0],
     baseError,
+  )
+})
+
+test('ErrorClass.parse() is not deep with "shallow: true"', (t) => {
+  t.deepEqual(
+    BaseError.parse(
+      { ...pluginErrorObject, prop: [baseErrorObject] },
+      { shallow: true },
+    ).prop[0],
+    baseErrorObject,
   )
 })
 
@@ -66,10 +75,8 @@ each(nonErrorObjects, ({ title }, value) => {
   test(`ErrorClass.parse() does not normalize top-level value with "loose: true" | ${title}`, (t) => {
     t.deepEqual(BaseError.parse(value, { loose: true }), value)
   })
-})
 
-each(nonErrorObjects, ({ title }, value) => {
-  test(`ErrorClass.parse() do not normalize deep value | ${title}`, (t) => {
+  test(`ErrorClass.parse() does not normalize deep value | ${title}`, (t) => {
     t.deepEqual(
       BaseError.parse({ ...pluginErrorObject, prop: [value] }).prop[0],
       value,
@@ -78,7 +85,7 @@ each(nonErrorObjects, ({ title }, value) => {
 })
 
 each([undefined, true], ({ title }, pluginsOpts) => {
-  test(`ErrorClass.parse() handle missing or invalid plugin options | ${title}`, (t) => {
+  test(`ErrorClass.parse() handles missing or invalid plugin options | ${title}`, (t) => {
     const cause = PluginError.parse({ ...pluginErrorObject, pluginsOpts })
     t.false('options' in new PluginError('', { cause }))
   })
