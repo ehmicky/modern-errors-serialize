@@ -9,12 +9,12 @@ export type { ErrorObject }
  */
 export interface Options {
   /**
-   *
+   * @default false
    */
   readonly loose?: boolean
 
   /**
-   *
+   * @default false
    */
   readonly shallow?: boolean
 }

@@ -15,11 +15,9 @@
 [plugin](https://github.com/ehmicky/modern-errors#-plugins) to serialize/parse
 errors.
 
-This adds [`BaseError.toJSON()`](#baseerrortojsonerror),
-[`BaseError.fromJSON()`](#baseerrorfromjsonerrorobject),
-[`BaseError.serialize()`](#baseerrorserializevalue) and
-[`BaseError.parse()`](#baseerrorparsevalue) to serialize/parse errors to/from
-plain objects.
+This adds [`BaseError.serialize()`](#baseerrorserializeerror) and
+[`BaseError.parse()`](#baseerrorparseerrorobject) to serialize/parse errors
+to/from plain objects.
 
 # Features
 
@@ -48,22 +46,22 @@ export const BaseError = ModernError.subclass('BaseError', {
 // ...
 ```
 
-[Serializing](#baseerrortojsonerror) errors to plain objects.
+[Serializing](#baseerrorserializeerror) errors to plain objects.
 
 ```js
-const error = new InputError('Wrong file.', { props: { filePath } })
-const errorObject = BaseError.toJSON(error)
-// { name: 'InputError', message: 'Wrong file', stack: '...', filePath: '...' }
+const error = new ExampleError('message', { props: { filePath } })
+const errorObject = BaseError.serialize(error)
+// { name: 'ExampleError', message: 'message', stack: '...', filePath: '...' }
 const errorString = JSON.stringify(errorObject)
-// '{"name":"InputError",...}'
+// '{"name":"ExampleError",...}'
 ```
 
-[Parsing](#baseerrorfromjsonerrorobject) errors from plain objects.
+[Parsing](#baseerrorparseerrorobject) errors from plain objects.
 
 ```js
 const newErrorObject = JSON.parse(errorString)
-const newError = BaseError.fromJSON(newErrorObject)
-// InputError: Wrong file.
+const newError = BaseError.parse(newErrorObject)
+// ExampleError: message
 //     at ...
 //   filePath: '...'
 ```
@@ -90,31 +88,18 @@ Plugin object to pass to the
 [`plugins` option](https://github.com/ehmicky/modern-errors#adding-plugins) of
 `ErrorClass.subclass()`.
 
-## BaseError.toJSON(error)
+## BaseError.serialize(error)
 
 `error`: `ErrorInstance`\
 _Return value_: `ErrorObject`
 
-Converts `error` to an error plain object that is
-[serializable](https://github.com/ehmicky/error-serializer#json-safety) to JSON
-([or YAML](https://github.com/ehmicky/error-serializer#custom-serializationparsing),
-etc.). All
+Converts `error` to an error plain object. All
 [error properties](https://github.com/ehmicky/error-serializer#additional-error-properties)
 are kept.
 [Plugin options](https://github.com/ehmicky/modern-errors#plugin-options) are
 also preserved.
 
-[Nested](#deep-serializationparsing) error instances are serialized deeply. If
-`error` is not an error instance, it is first
-[normalized](https://github.com/ehmicky/modern-errors#invalid-errors) to one.
-
-This is also set as
-[`error.toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior).
-Therefore
-[`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
-automatically calls it.
-
-## BaseError.fromJSON(errorObject)
+## BaseError.parse(errorObject)
 
 `errorObject`: `ErrorObject`\
 _Return value_: `ErrorInstance`
@@ -122,20 +107,88 @@ _Return value_: `ErrorInstance`
 Converts `errorObject` to an error instance. The original error classes are
 preserved.
 
-[Nested](#deep-serializationparsing) error plain objects are parsed deeply. If
-`errorObject` is not an error plain object, it is first normalized to one.
+## Options
 
-## BaseError.serialize(value)
+_Type_: `object`
 
-This is like [`BaseError.toJSON(value)`](#baseerrortojsonerror) except, if
-`value` is not an error instance, it is kept as is. However, any nested error
-instances is still serialized.
+### shallow
 
-## BaseError.parse(value)
+_Type_: `boolean`\
+_Default_: `false`
 
-This is like [`BaseError.fromJSON(value)`](#baseerrorfromjsonerrorobject)
-except, if `value` is not an error plain object, it is kept as is. However, any
-nested error plain object is still parsed.
+Unless this option is `true`, nested errors are also serialized/parsed. They can
+be inside other errors, plain objects or arrays.
+
+<!-- eslint-disable no-unused-expressions -->
+
+```js
+const inner = new ExampleError('inner')
+const error = new ExampleError('example', { props: { inner } })
+
+BaseError.serialize(error).inner // { name: 'BaseError', message: 'inner', ... }
+BaseError.serialize(error, { shallow: true }).inner // BaseError
+
+const errorObject = BaseError.serialize(error)
+BaseError.parse(errorObject).inner // BaseError
+BaseError.parse(errorObject, { shallow: true }).inner // { name: '...', ... }
+```
+
+### loose
+
+_Type_: `boolean`\
+_Default_: `false`
+
+By default, when the argument is not an `Error` instance or error plain object,
+it is converted to one. If this option is `true`, it is kept as is instead.
+
+```js
+BaseError.serialize('example') // { name: 'BaseError', message: 'example', ... }
+BaseError.serialize('example', { loose: true }) // 'example'
+
+BaseError.parse('example') // BaseError
+BaseError.parse('example', { loose: true }) // 'example'
+```
+
+## Configuration
+
+[Options](#options) can apply to (in priority order):
+
+- Any error: second argument to
+  [`ModernError.subclass()`](https://github.com/ehmicky/modern-errors#options-1)
+
+```js
+export const BaseError = ModernError.subclass('BaseError', {
+  plugins: [modernErrorsSerialize],
+  serialize: options,
+})
+```
+
+- Any error of a specific class (and its subclasses): second argument to
+  [`ErrorClass.subclass()`](https://github.com/ehmicky/modern-errors#options-1)
+
+```js
+export const ExampleError = BaseError.subclass('ExampleError', {
+  serialize: options,
+})
+```
+
+- A specific error: second argument to
+  [`new ErrorClass()`](https://github.com/ehmicky/modern-errors#options-3)
+
+```js
+throw new ExampleError('...', { serialize: options })
+```
+
+- A specific [`BaseError.serialize(error)`](#baseerrorserializeerror) or
+  [`BaseError.parse(errorObject)`](#baseerrorparseerrorobject) call
+
+```js
+BaseError.serialize(error, options)
+```
+
+```js
+BaseError.parse(errorObject, options)
+```
 
 # Usage
 
@@ -145,26 +198,45 @@ Error plain objects are always
 [safe to serialize with JSON](https://github.com/ehmicky/safe-json-value).
 
 ```js
-const error = new InputError('Wrong file.')
+const error = new ExampleError('message')
 error.cycle = error
 
 // Cycles make `JSON.stringify()` throw, so they are removed
-console.log(BaseError.toJSON(error).cycle) // undefined
+console.log(BaseError.serialize(error).cycle) // undefined
 ```
 
 ## Deep serialization/parsing
 
-Objects and arrays are deeply serialized and parsed.
+The [`loose` option](#loose) can be used to deeply serialize/parse objects and
+arrays.
 
 ```js
-const error = new InputError('Wrong file.')
+const error = new ExampleError('message')
+const deepArray = BaseError.serialize([{}, { error }], { loose: true })
+
+const jsonString = JSON.stringify(deepArray)
+const newDeepArray = JSON.parse(jsonString)
+
+const newError = BaseError.parse(newDeepArray, { loose: true })[1].error
+// ExampleError: message
+//     at ...
+```
+
+## Automatic serialization
+
+[`error.toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior)
+is defined. It is automatically called by
+[`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify).
+
+```js
+const error = new ExampleError('message')
 const deepArray = [{}, { error }]
 
 const jsonString = JSON.stringify(deepArray)
 const newDeepArray = JSON.parse(jsonString)
 
-const newError = BaseError.parse(newDeepArray)[1].error
-// InputError: Wrong file.
+const newError = BaseError.parse(newDeepArray, { loose: true })[1].error
+// ExampleError: message
 //     at ...
 ```
 
@@ -176,42 +248,42 @@ serialization/parsing logic to be performed.
 ```js
 import { dump, load } from 'js-yaml'
 
-const error = new InputError('Wrong file.')
-const errorObject = BaseError.toJSON(error)
+const error = new ExampleError('message')
+const errorObject = BaseError.serialize(error)
 const errorYamlString = dump(errorObject)
-// name: InputError
-// message: Wrong file.
-// stack: InputError: Wrong file. ...
+// name: ExampleError
+// message: message
+// stack: ExampleError: message ...
 const newErrorObject = load(errorYamlString)
-const newError = BaseError.fromJSON(newErrorObject) // InputError: Wrong file.
+const newError = BaseError.parse(newErrorObject) // ExampleError: message
 ```
 
 ## Additional error properties
 
 ```js
-const error = new InputError('Wrong file.', { props: { prop: true } })
-const errorObject = BaseError.toJSON(error)
+const error = new ExampleError('message', { props: { prop: true } })
+const errorObject = BaseError.serialize(error)
 console.log(errorObject.prop) // true
-const newError = BaseError.fromJSON(errorObject)
+const newError = BaseError.parse(errorObject)
 console.log(newError.prop) // true
 ```
 
 ## Aggregate `errors`
 
 ```js
-const error = new InputError('Wrong file.', {
+const error = new ExampleError('message', {
   errors: [new ExampleError('one'), new ExampleError('two')],
 })
 
-const errorObject = BaseError.toJSON(error)
+const errorObject = BaseError.serialize(error)
 // {
-//   name: 'InputError',
-//   message: 'Wrong file.',
+//   name: 'ExampleError',
+//   message: 'message',
 //   stack: '...',
 //   errors: [{ name: 'ExampleError', message: 'one', stack: '...' }, ...],
 // }
-const newError = BaseError.fromJSON(errorObject)
-// InputError: Wrong file.
+const newError = BaseError.parse(errorObject)
+// ExampleError: message
 //   [errors]: [ExampleError: one, ExampleError: two]
 ```
 
@@ -226,7 +298,7 @@ enumerable.
 <!-- eslint-disable fp/no-this, fp/no-mutation -->
 
 ```js
-const InputError = BaseError.subclass('InputError', {
+const ExampleError = BaseError.subclass('ExampleError', {
   custom: class extends BaseError {
     constructor(message, options, prop) {
       super(message, options, prop)
@@ -235,10 +307,10 @@ const InputError = BaseError.subclass('InputError', {
   },
 })
 
-const error = new InputError('Wrong file.', {}, true)
-const errorObject = BaseError.toJSON(error)
+const error = new ExampleError('message', {}, true)
+const errorObject = BaseError.serialize(error)
 // `constructor(message, options, prop)` is not called
-const newError = BaseError.fromJSON(errorObject)
+const newError = BaseError.parse(errorObject)
 // But properties set by that `constructor(...)` are kept
 console.log(newError.prop) // true
 ```
