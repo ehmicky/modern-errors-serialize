@@ -4,23 +4,31 @@ import { applyLoose } from './loose.js'
 
 // `ErrorClass.serialize(value)`
 export const serialize = function (
-  { ErrorClass, instancesData, options },
+  { ErrorClass, instancesData, errorInfo },
   value,
 ) {
-  return serializeValue({ ErrorClass, instancesData, options, value })
+  return serializeValue({ ErrorClass, instancesData, errorInfo, value })
 }
 
 // `error.toJSON()`
-export const toJSON = function ({ ErrorClass, instancesData, options, error }) {
-  return serializeValue({ ErrorClass, instancesData, options, value: error })
+export const toJSON = function ({
+  ErrorClass,
+  instancesData,
+  errorInfo,
+  error,
+}) {
+  return serializeValue({ ErrorClass, instancesData, errorInfo, value: error })
 }
 
 const serializeValue = function ({
   ErrorClass,
   instancesData,
-  options: { loose, shallow },
+  errorInfo,
   value,
 }) {
+  const {
+    options: { loose, shallow },
+  } = errorInfo(value)
   const valueA = applyLoose(value, loose, ErrorClass)
   return serializeToObject(valueA, {
     loose,

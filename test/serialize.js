@@ -59,6 +59,27 @@ each([baseError, nativeError], ({ title }, deepError) => {
     )
   })
 
+  test(`ErrorClass.serialize() uses instance options | ${title}`, (t) => {
+    const shallowError = new BaseError('', {
+      serialize: { shallow: true },
+      cause: error,
+    })
+
+    t.deepEqual(BaseError.serialize(shallowError).prop[0], deepError)
+  })
+
+  test(`ErrorClass.serialize() uses method options over instance options | ${title}`, (t) => {
+    const shallowError = new BaseError('', {
+      serialize: { shallow: false },
+      cause: error,
+    })
+
+    t.deepEqual(
+      BaseError.serialize(shallowError, { shallow: true }).prop[0],
+      deepError,
+    )
+  })
+
   test(`ErrorClass.serialize() can be deep and loose | ${title}`, (t) => {
     t.deepEqual(
       BaseError.serialize([error], { loose: true })[0].prop[0],
