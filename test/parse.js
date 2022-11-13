@@ -7,6 +7,8 @@ import {
   errorObject,
   nativeError,
   nativeErrorObject,
+  PluginError,
+  pluginErrorObject,
 } from './helpers/main.js'
 
 test('ErrorClass.parse() parses error plain objects', (t) => {
@@ -55,4 +57,25 @@ const InvalidError = BaseError.subclass('InvalidError', {
 test('ErrorClass.parse() handles constructors that throw', (t) => {
   const invalidError = new InvalidError('message', {}, Symbol('test'))
   t.true(BaseError.parse(invalidError.toJSON()) instanceof BaseError)
+})
+
+test('ErrorClass.parse() keeps plugin options', (t) => {
+  const cause = PluginError.parse(pluginErrorObject)
+  t.false('pluginsOpts' in cause)
+  t.true(new PluginError('', { cause }).options)
+})
+
+test('ErrorClass.parse() keeps plugin options deeply', (t) => {
+  const cause = PluginError.parse({
+    ...pluginErrorObject,
+    cause: pluginErrorObject,
+  })
+  t.true(new PluginError('', { cause }).options)
+})
+
+each([undefined, true], ({ title }, pluginsOpts) => {
+  test(`ErrorClass.parse() handles missing or invalid plugin options | ${title}`, (t) => {
+    const cause = PluginError.parse({ ...pluginErrorObject, pluginsOpts })
+    t.false('options' in new PluginError('', { cause }))
+  })
 })
