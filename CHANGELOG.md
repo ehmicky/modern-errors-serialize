@@ -4,13 +4,18 @@
 
 - [`modern-errors@5`](https://github.com/ehmicky/modern-errors/releases/tag/5.0.0)
   is now required
-- [`BaseError.parse(value)`](README.md#baseerrorparseerrorobject) is now deep by
-  default. If `value` is not an error object, it is not converted to one
-  anymore.
+- If the argument passed to
+  [`BaseError.parse(value)`](README.md#baseerrorparseerrorobject) is not an
+  error object, it is not converted to one anymore. Also, if it is an unknown
+  error, it is not normalized anymore.
+- If an error class uses
+  [`custom` option](https://github.com/ehmicky/modern-errors#-custom-logic) and
+  a `constructor` is defined, that constructor is not called anymore. However,
+  any property previously set by that constructor is still preserved, providing
+  it is serializable and enumerable.
 - The serialization format has changed: instead of serializing the constructor
   arguments as `constructorArgs`, the plugins options are now serialized as
-  `pluginsOpts`. Those properties are undocumented and mostly internal, so this
-  should not have any impact in most cases.
+  `pluginsOpts`. Those properties are undocumented and mostly internal.
 
 # 1.4.0
 
