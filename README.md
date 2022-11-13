@@ -97,7 +97,9 @@ Converts errors to plain objects that are
 ([or YAML](https://github.com/ehmicky/error-serializer#custom-serializationparsing),
 etc.). This is
 [automatically called](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior)
-by `JSON.stringify()`. All error properties
+by `JSON.stringify()`.
+
+All error properties
 [are kept](https://github.com/ehmicky/error-serializer#additional-error-properties).
 [Plugin options](https://github.com/ehmicky/modern-errors#plugin-options) are
 also preserved.
@@ -105,10 +107,10 @@ also preserved.
 ## BaseError.parse(value)
 
 If `value` is an error plain object, converts it to an identical error instance.
-The original error class is preserved.
-
 Otherwise, [recurse](#deep-serializationparsing) over `value` and parse any
 nested error plain object.
+
+The original error classes are preserved.
 
 # Usage
 
