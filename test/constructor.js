@@ -1,4 +1,5 @@
 import test from 'ava'
+import { excludeKeys } from 'filter-obj'
 import { each } from 'test-each'
 
 import { BaseError } from './helpers/main.js'
@@ -14,6 +15,8 @@ const testPlugin = {
 }
 
 const PluginError = BaseError.subclass('PluginError', { plugins: [testPlugin] })
+const pluginError = new PluginError('message', { test: true })
+const pluginErrorObject = excludeKeys(pluginError.toJSON(), ['options'])
 
 const InvalidError = BaseError.subclass('InvalidError', {
   custom: class extends BaseError {
@@ -33,8 +36,7 @@ test('ErrorClass.parse() handles constructors that throw', (t) => {
 })
 
 test('Serialization keeps plugin options', (t) => {
-  const error = new PluginError('message', { test: true })
-  t.true(error.toJSON().pluginsOpts.test)
+  t.true(pluginErrorObject.pluginsOpts.test)
 })
 
 test('Serialization keeps plugin options deeply', (t) => {
@@ -55,34 +57,27 @@ test('Serialization does not keep empty plugin options', (t) => {
 })
 
 test('Serialization does not mutate error', (t) => {
-  const error = new PluginError('message', { test: true })
-  error.toJSON()
-  t.false('pluginsOpts' in error)
+  pluginError.toJSON()
+  t.false('pluginsOpts' in pluginError)
 })
 
 test('Parsing keeps plugin options', (t) => {
-  const error = new PluginError('message', { test: true })
-  // eslint-disable-next-line no-unused-vars
-  const { options, ...errorObject } = error.toJSON()
-  const cause = PluginError.parse(errorObject)
+  const cause = PluginError.parse(pluginErrorObject)
   t.false('pluginsOpts' in cause)
   t.true(new PluginError('', { cause }).options)
 })
 
 test('Parsing keeps plugin options deeply', (t) => {
-  const error = new PluginError('message', { test: true })
-  // eslint-disable-next-line no-unused-vars
-  const { options, ...errorObject } = error.toJSON()
-  const cause = PluginError.parse({ ...errorObject, cause: errorObject })
+  const cause = PluginError.parse({
+    ...pluginErrorObject,
+    cause: pluginErrorObject,
+  })
   t.true(new PluginError('', { cause }).options)
 })
 
 each([undefined, true], ({ title }, pluginsOpts) => {
   test(`Parsing handles missing or invalid plugin options | ${title}`, (t) => {
-    const error = new PluginError('message', { test: true })
-    // eslint-disable-next-line no-unused-vars
-    const { options, ...errorObject } = error.toJSON()
-    const cause = PluginError.parse({ ...errorObject, pluginsOpts })
+    const cause = PluginError.parse({ ...pluginErrorObject, pluginsOpts })
     t.false('options' in new PluginError('', { cause }))
   })
 })
