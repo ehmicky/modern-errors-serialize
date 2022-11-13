@@ -15,9 +15,11 @@
 [plugin](https://github.com/ehmicky/modern-errors#-plugins) to serialize/parse
 errors.
 
-This adds [`BaseError.toJSON()`](#baseerrortojsonerror) and
-[`BaseError.parse()`](#baseerrorparseerrorobject) to serialize/parse errors
-to/from plain objects.
+This adds [`BaseError.serialize()`](#baseerrorserializevalue),
+[`BaseError.parse()`](#baseerrorparseerrorobject),
+[`BaseError.toJSON()`](#baseerrortojsonerror) and
+[`BaseError.fromJSON()`](#baseerrorfromjsonerrorobject) to serialize/parse
+errors to/from plain objects.
 
 # Features
 
@@ -56,11 +58,11 @@ const errorString = JSON.stringify(error)
 // '{"name":"InputError",...}'
 ```
 
-[Parsing](#baseerrorparseerrorobject) errors from plain objects.
+[Parsing](#baseerrorfromjsonerrorobject) errors from plain objects.
 
 ```js
 const newErrorObject = JSON.parse(errorString)
-const newError = BaseError.parse(newErrorObject)
+const newError = BaseError.fromJSON(newErrorObject)
 // InputError: Wrong file.
 //     at ...
 //   filePath: '...'
@@ -90,19 +92,13 @@ Plugin object to pass to the
 
 ## BaseError.toJSON(error)
 
-`error`: `Error`\
+`error`: `ErrorInstance`\
 _Return value_: `ErrorObject`
 
-Converts errors to plain objects that are
+Converts `error` to an error plain object that is
 [serializable](https://github.com/ehmicky/error-serializer#json-safety) to JSON
 ([or YAML](https://github.com/ehmicky/error-serializer#custom-serializationparsing),
 etc.).
-
-This is also set as
-[`error.toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior),
-so
-[`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
-automatically calls it.
 
 All
 [error properties](https://github.com/ehmicky/error-serializer#additional-error-properties)
@@ -110,13 +106,39 @@ are kept.
 [Plugin options](https://github.com/ehmicky/modern-errors#plugin-options) are
 also preserved.
 
-## BaseError.parse(value)
+[Nested](#deep-serializationparsing) error instances are also serialized. If
+`error` is not an error instance, it is first
+[normalized](https://github.com/ehmicky/modern-errors#invalid-errors) to one.
 
-If `value` is an error plain object, converts it to an error instance.
-Otherwise, [recurse](#deep-serializationparsing) over `value` and parse any
-nested error plain object.
+This is also set as
+[`error.toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior),
+so
+[`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
+automatically calls it.
+
+## BaseError.fromJSON(errorObject)
+
+`errorObject`: `ErrorObject`\
+_Return value_: `ErrorInstance`
+
+Converts `errorObject` to an error instance.
 
 The original error classes are preserved.
+
+[Nested](#deep-serializationparsing) error plain objects are also parsed. If
+`errorObject` is not an error plain object, it is first normalized to one.
+
+## BaseError.serialize(value)
+
+This is like [`BaseError.toJSON(value)`](#baseerrortojsonerror) except, if
+`error` is not an error instance, it is not converted to an error plain object.
+However, any nested error instances is still serialized.
+
+## BaseError.parse(value)
+
+This is like [`BaseError.fromJSON(value)`](#baseerrorfromjsonerrorobject)
+except, if `error` is not an error plain object, it is not converted to an error
+instance. However, any nested error plain object is still parsed.
 
 # Usage
 
@@ -164,7 +186,7 @@ const errorYamlString = dump(errorObject)
 // message: Wrong file.
 // stack: InputError: Wrong file. ...
 const newErrorObject = load(errorYamlString)
-const newError = BaseError.parse(newErrorObject) // InputError: Wrong file.
+const newError = BaseError.fromJSON(newErrorObject) // InputError: Wrong file.
 ```
 
 ## Additional error properties
@@ -173,7 +195,7 @@ const newError = BaseError.parse(newErrorObject) // InputError: Wrong file.
 const error = new InputError('Wrong file.', { props: { prop: true } })
 const errorObject = BaseError.toJSON(error)
 console.log(errorObject.prop) // true
-const newError = BaseError.parse(errorObject)
+const newError = BaseError.fromJSON(errorObject)
 console.log(newError.prop) // true
 ```
 
@@ -191,7 +213,7 @@ const errorObject = BaseError.toJSON(error)
 //   stack: '...',
 //   errors: [{ name: 'ExampleError', message: 'one', stack: '...' }, ...],
 // }
-const newError = BaseError.parse(errorObject)
+const newError = BaseError.fromJSON(errorObject)
 // InputError: Wrong file.
 //   [errors]: [ExampleError: one, ExampleError: two]
 ```
@@ -219,7 +241,7 @@ const InputError = BaseError.subclass('InputError', {
 const error = new InputError('Wrong file.', {}, true)
 const errorObject = BaseError.toJSON(error)
 // `constructor(message, options, prop)` is not called
-const newError = BaseError.parse(errorObject)
+const newError = BaseError.fromJSON(errorObject)
 // But properties set by that `constructor(...)` are kept
 console.log(newError.prop) // true
 ```
