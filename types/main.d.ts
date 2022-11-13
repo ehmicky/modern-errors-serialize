@@ -9,12 +9,41 @@ export type { ErrorObject }
  */
 export interface Options {
   /**
+   * By default, when the argument is not an `Error` instance or an error plain
+   * object, it is converted to one. If this option is `true`, it is kept as is
+   * instead.
+   *
    * @default false
+   *
+   * @example
+   * ```js
+   * BaseError.serialize('example') // { name: 'BaseError', message: 'example', ... }
+   * BaseError.serialize('example', { loose: true }) // 'example'
+   *
+   * BaseError.parse('example') // BaseError
+   * BaseError.parse('example', { loose: true }) // 'example'
+   * ```
    */
   readonly loose?: boolean
 
   /**
+   * Unless this option is `true`, nested errors are also serialized/parsed.
+   * They can be inside other errors, plain objects or arrays.
+   *
    * @default false
+   *
+   * @example
+   * ```js
+   * const inner = new ExampleError('inner')
+   * const error = new ExampleError('example', { props: { inner } })
+   *
+   * BaseError.serialize(error).inner // { name: 'BaseError', message: 'inner', ... }
+   * BaseError.serialize(error, { shallow: true }).inner // BaseError
+   *
+   * const errorObject = BaseError.serialize(error)
+   * BaseError.parse(errorObject).inner // BaseError
+   * BaseError.parse(errorObject, { shallow: true }).inner // { name: '...', ... }
+   * ```
    */
   readonly shallow?: boolean
 }
@@ -22,9 +51,8 @@ export interface Options {
 /**
  * `modern-errors-serialize` plugin.
  *
- * This plugin adds `BaseError.toJSON()`, `BaseError.fromJSON()`,
- * `BaseError.serialize()` and `BaseError.parse()` to serialize/parse errors
- * to/from plain objects.
+ * This plugin adds `BaseError.serialize()` and `BaseError.parse()` to
+ * serialize/parse errors to/from plain objects.
  */
 declare const plugin: {
   name: 'serialize'
@@ -32,75 +60,63 @@ declare const plugin: {
   isOptions: (options: unknown) => boolean
   staticMethods: {
     /**
-     * This is like `BaseError.toJSON(value)` except, if `value` is not an error
-     * instance, it is kept as is. However, any nested error instances is still
-     * serialized.
+     * Converts `error` to an error plain object. All error properties are kept.
+     * [Plugin options](https://github.com/ehmicky/modern-errors#plugin-options)
+     * are also preserved.
      *
      * @example
      * ```js
-     * const error = new InputError('Wrong file.')
-     * const deepArray = [{}, { error }]
+     * const error = new ExampleError('message', { props: { filePath } })
      *
-     * const jsonString = JSON.stringify(BaseError.serialize(deepArray))
-     * const newDeepArray = JSON.parse(jsonString)
-     *
-     * const newError = BaseError.parse(newDeepArray)[1].error
-     * // InputError: Wrong file.
-     * //     at ...
+     * const errorObject = BaseError.serialize(error)
+     * // { name: 'ExampleError', message: 'message', stack: '...', filePath: '...' }
+     * const errorString = JSON.stringify(errorObject)
+     * // '{"name":"ExampleError",...}'
      * ```
      */
     serialize: (info: Info['staticMethods'], error: unknown) => ErrorObject
 
     /**
-     * This is like `BaseError.fromJSON(value)` except, if `value` is not an
-     * error plain object, it is kept as is. However, any nested error plain
-     * object is still parsed.
+     * Converts `errorObject` to an error instance. The original error classes
+     * are preserved providing they are
+     * [subclasses](https://github.com/ehmicky/modern-errors#create-error-classes)
+     * of `BaseError`.
      *
      * @example
      * ```js
-     * const error = new InputError('Wrong file.')
-     * const deepArray = [{}, { error }]
+     * const error = new ExampleError('message', { props: { filePath } })
      *
-     * const jsonString = JSON.stringify(BaseError.serialize(deepArray))
-     * const newDeepArray = JSON.parse(jsonString)
+     * const errorObject = BaseError.serialize(error)
+     * // { name: 'ExampleError', message: 'message', stack: '...', filePath: '...' }
+     * const errorString = JSON.stringify(errorObject)
+     * // '{"name":"ExampleError",...}'
      *
-     * const newError = BaseError.parse(newDeepArray)[1].error
-     * // InputError: Wrong file.
+     * const newErrorObject = JSON.parse(errorString)
+     * const newError = BaseError.parse(newErrorObject)
+     * // ExampleError: message
      * //     at ...
+     * //   filePath: '...'
      * ```
      */
     parse: (info: Info['staticMethods'], errorObject: unknown) => ErrorInstance
   }
   instanceMethods: {
     /**
-     * Converts `error` to an error plain object that is
-     * [serializable](https://github.com/ehmicky/error-serializer#json-safety)
-     * to JSON
-     * ([or YAML](https://github.com/ehmicky/error-serializer#custom-serializationparsing),
-     * etc.). All
-     * [error properties](https://github.com/ehmicky/error-serializer#additional-error-properties)
-     * are kept.
-     * [Plugin options](https://github.com/ehmicky/modern-errors#plugin-options)
-     * are also preserved.
-     *
-     * Nested error instances are serialized deeply. If `error` is not an error
-     * instance, it is first
-     * [normalized](https://github.com/ehmicky/modern-errors#invalid-errors) to
-     * one.
-     *
-     * This is also set as
-     * [`error.toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior).
-     * Therefore
-     * [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
-     * automatically calls it.
+     * [`error.toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior)
+     * is defined. It is automatically called by
+     * [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify).
      *
      * @example
      * ```js
-     * const error = new InputError('Wrong file.', { props: { filePath } })
-     * const errorObject = BaseError.toJSON(error)
-     * // { name: 'InputError', message: 'Wrong file', stack: '...', filePath: '...' }
-     * const errorString = JSON.stringify(errorObject)
-     * // '{"name":"InputError",...}'
+     * const error = new ExampleError('message')
+     * const deepArray = [{}, { error }]
+     *
+     * const jsonString = JSON.stringify(deepArray)
+     * const newDeepArray = JSON.parse(jsonString)
+     *
+     * const newError = BaseError.parse(newDeepArray, { loose: true })[1].error
+     * // ExampleError: message
+     * //     at ...
      * ```
      */
     toJSON: (info: Info['instanceMethods']) => ErrorObject
