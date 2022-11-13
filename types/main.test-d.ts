@@ -7,7 +7,7 @@ const BaseError = ModernError.subclass('BaseError', {
   plugins: [modernErrorsSerialize],
 })
 const error = new BaseError('')
-const errorObject = error.toJSON()
+const errorObject = BaseError.toJSON(error)
 
 expectError(
   ModernError.subclass('TestError', {
@@ -15,11 +15,12 @@ expectError(
     serialize: undefined,
   }),
 )
-expectError(error.toJSON(undefined))
+expectError(BaseError.toJSON(error, undefined))
 expectError(BaseError.parse(errorObject, undefined))
 
 expectType<ErrorObject>(errorObject)
 expectType<string>(errorObject.name)
+expectType<ErrorObject>(error.toJSON())
 
 expectType<unknown>(BaseError.parse(errorObject))
 expectType<unknown>(BaseError.parse({ errorObject }))

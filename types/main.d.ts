@@ -7,8 +7,8 @@ export type { ErrorObject }
 /**
  * `modern-errors-serialize` plugin.
  *
- * This plugin adds `error.toJSON()` and `BaseError.parse()` to serialize/parse
- * errors to plain objects.
+ * This plugin adds `BaseError.toJSON()` and `BaseError.parse()` to
+ * serialize/parse errors to plain objects.
  */
 declare const plugin: {
   name: 'serialize'
@@ -18,9 +18,13 @@ declare const plugin: {
      * [serializable](https://github.com/ehmicky/error-serializer#json-safety)
      * to JSON
      * ([or YAML](https://github.com/ehmicky/error-serializer#custom-serializationparsing),
-     * etc.). This is
-     * [automatically called](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior)
-     * by `JSON.stringify()`.
+     * etc.).
+     *
+     * This is also set as
+     * [`error.toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior),
+     * so
+     * [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
+     * automatically calls it.
      *
      * All
      * [error properties](https://github.com/ehmicky/error-serializer#additional-error-properties)
@@ -31,7 +35,7 @@ declare const plugin: {
      * @example
      * ```js
      * const error = new InputError('Wrong file.', { props: { filePath } })
-     * const errorObject = error.toJSON()
+     * const errorObject = BaseError.toJSON(error)
      * // { name: 'InputError', message: 'Wrong file', stack: '...', filePath: '...' }
      * const errorString = JSON.stringify(error)
      * // '{"name":"InputError",...}'

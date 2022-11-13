@@ -56,7 +56,9 @@ const InvalidError = BaseError.subclass('InvalidError', {
 
 test('ErrorClass.parse() handles constructors that throw', (t) => {
   const invalidError = new InvalidError('message', {}, Symbol('test'))
-  t.true(BaseError.parse(invalidError.toJSON()) instanceof BaseError)
+  t.true(
+    BaseError.parse(InvalidError.toJSON(invalidError)) instanceof BaseError,
+  )
 })
 
 test('ErrorClass.parse() keeps plugin options', (t) => {

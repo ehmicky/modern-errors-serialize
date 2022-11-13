@@ -1,7 +1,7 @@
 import { serialize, parse as parseErrorObject } from 'error-serializer'
 import isPlainObject from 'is-plain-obj'
 
-// `error.toJSON()`
+// `ErrorClass.toJSON(error)` or `error.toJSON()`
 const toJSON = function ({ error, instancesData }) {
   return serialize(error, {
     beforeSerialize: beforeSerialize.bind(undefined, instancesData),

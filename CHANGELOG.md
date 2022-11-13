@@ -1,3 +1,10 @@
+# 2.2.0
+
+## Features
+
+- `error.toJSON()` has been renamed to
+  [`BaseError.toJSON(error)`](README.md#baseerrortojsonerror)
+
 # 2.1.0
 
 ## Features
