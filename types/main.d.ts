@@ -1,6 +1,6 @@
 import type { ErrorObject } from 'error-serializer'
 
-import type { Info } from 'modern-errors'
+import type { Info, ErrorInstance } from 'modern-errors'
 
 export type { ErrorObject }
 
@@ -45,6 +45,11 @@ declare const plugin: {
   }
   staticMethods: {
     /**
+     *
+     */
+    serialize: (info: Info['staticMethods'], error: unknown) => unknown
+
+    /**
      * If `value` is an error plain object, converts it to an error instance.
      * Otherwise, recurse over `value` and parse any nested error plain object.
      *
@@ -60,6 +65,14 @@ declare const plugin: {
      * ```
      */
     parse: (info: Info['staticMethods'], errorObject: unknown) => unknown
+
+    /**
+     *
+     */
+    fromJSON: (
+      info: Info['staticMethods'],
+      errorObject: unknown,
+    ) => ErrorInstance
   }
 }
 export default plugin
