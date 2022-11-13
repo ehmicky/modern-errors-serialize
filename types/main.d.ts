@@ -1,6 +1,6 @@
 import type { ErrorObject } from 'error-serializer'
 
-import type { Info, ErrorInstance } from 'modern-errors'
+import type { Info } from 'modern-errors'
 
 export type { ErrorObject }
 
@@ -20,8 +20,13 @@ declare const plugin: {
      * ([or YAML](https://github.com/ehmicky/error-serializer#custom-serializationparsing),
      * etc.). This is
      * [automatically called](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior)
-     * by `JSON.stringify()`. All error properties
-     * [are kept](https://github.com/ehmicky/error-serializer#additional-error-properties).
+     * by `JSON.stringify()`.
+     *
+     * All
+     * [error properties](https://github.com/ehmicky/error-serializer#additional-error-properties)
+     * are kept.
+     * [Plugin options](https://github.com/ehmicky/modern-errors#plugin-options)
+     * are also preserved.
      *
      * @example
      * ```js
@@ -36,8 +41,10 @@ declare const plugin: {
   }
   staticMethods: {
     /**
-     * Converts an error plain object back to an identical error instance.
-     * The original error class is preserved.
+     * If `value` is an error plain object, converts it to an error instance.
+     * Otherwise, recurse over `value` and parse any nested error plain object.
+     *
+     * The original error classes are preserved.
      *
      * @example
      * ```js
@@ -48,10 +55,7 @@ declare const plugin: {
      * //   filePath: '...'
      * ```
      */
-    parse: (
-      info: Info['staticMethods'],
-      errorObject: ErrorObject,
-    ) => ErrorInstance
+    parse: (info: Info['staticMethods'], errorObject: unknown) => unknown
   }
 }
 export default plugin
