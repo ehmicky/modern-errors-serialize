@@ -1,4 +1,4 @@
-# 2.3.0 (not released yet)
+# 2.3.0
 
 ## Features
 
