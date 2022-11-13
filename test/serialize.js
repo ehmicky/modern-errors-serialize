@@ -60,14 +60,6 @@ each([baseError, nativeError], ({ title }, deepError) => {
   })
 })
 
-test('ErrorClass.serialize() normalizes the top-level value by default', (t) => {
-  t.is(BaseError.serialize('').name, BaseError.name)
-})
-
-test('ErrorClass.serialize() does not normalize the top-level value with "loose: true"', (t) => {
-  t.is(BaseError.serialize('', { loose: true }), '')
-})
-
 test('error.toJSON() serializes', (t) => {
   t.deepEqual(baseError.toJSON(), convertError(baseError))
 })
