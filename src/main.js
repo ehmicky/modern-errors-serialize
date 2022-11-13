@@ -5,9 +5,9 @@ const toJSON = function ({ error }) {
   return serialize(error)
 }
 
-const parse = function ({ ErrorClasses, AnyError }, errorObject) {
+const parse = function ({ ErrorClasses, BaseError }, errorObject) {
   const value = parseLib(errorObject, { classes: ErrorClasses })
-  return isErrorInstance(value) ? AnyError.normalize(value) : value
+  return isErrorInstance(value) ? BaseError.normalize(value) : value
 }
 
 export default {

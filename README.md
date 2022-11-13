@@ -16,7 +16,7 @@
 errors.
 
 This adds [`error.toJSON()`](#errortojson) and
-[`AnyError.parse()`](#anyerrorparseerrorobject) to serialize/parse errors
+[`BaseError.parse()`](#baseerrorparseerrorobject) to serialize/parse errors
 to/from plain objects.
 
 # Features
@@ -25,7 +25,7 @@ to/from plain objects.
 - [Deep serialization/parsing](#deep-serializationparsing)
 - [Custom serialization/parsing](#custom-serializationparsing) (e.g. YAML or
   `process.send()`)
-- Keeps [error classes](#anyerrorparseerrorobject)
+- Keeps [error classes](#baseerrorparseerrorobject)
 - Preserves errors' [additional properties](#additional-error-properties)
 - Can keep `custom` [constructor's arguments](#constructors-arguments)
 - Works [recursively](#aggregate-errors) with
@@ -41,7 +41,7 @@ to/from plain objects.
 import modernErrors from 'modern-errors'
 import modernErrorsSerialize from 'modern-errors-serialize'
 
-export const AnyError = modernErrors([modernErrorsSerialize])
+export const BaseError = modernErrors([modernErrorsSerialize])
 // ...
 ```
 
@@ -55,11 +55,11 @@ const errorString = JSON.stringify(error)
 // '{"name":"InputError",...}'
 ```
 
-[Parsing](#anyerrorparseerrorobject) errors from plain objects.
+[Parsing](#baseerrorparseerrorobject) errors from plain objects.
 
 ```js
 const newErrorObject = JSON.parse(errorString)
-const newError = AnyError.parse(newErrorObject)
+const newError = BaseError.parse(newErrorObject)
 // InputError: Wrong file.
 //     at ...
 //   filePath: '...'
@@ -98,7 +98,7 @@ etc.). This is
 by `JSON.stringify()`. All error properties
 [are kept](https://github.com/ehmicky/error-serializer#additional-error-properties).
 
-## AnyError.parse(errorObject)
+## BaseError.parse(errorObject)
 
 `errorObject`: `ErrorObject`\
 _Return value_: `ErrorInstance`
@@ -132,7 +132,7 @@ const deepArray = [{}, { error }]
 const jsonString = JSON.stringify(deepArray)
 const newDeepArray = JSON.parse(jsonString)
 
-const newError = AnyError.parse(newDeepArray)[1].error
+const newError = BaseError.parse(newDeepArray)[1].error
 // InputError: Wrong file.
 //     at ...
 ```
@@ -152,7 +152,7 @@ const errorYamlString = dump(errorObject)
 // message: Wrong file.
 // stack: InputError: Wrong file. ...
 const newErrorObject = load(errorYamlString)
-const newError = AnyError.parse(newErrorObject) // InputError: Wrong file.
+const newError = BaseError.parse(newErrorObject) // InputError: Wrong file.
 ```
 
 ## Additional error properties
@@ -161,7 +161,7 @@ const newError = AnyError.parse(newErrorObject) // InputError: Wrong file.
 const error = new InputError('Wrong file.', { props: { prop: true } })
 const errorObject = error.toJSON()
 console.log(errorObject.prop) // true
-const newError = AnyError.parse(errorObject)
+const newError = BaseError.parse(errorObject)
 console.log(newError.prop) // true
 ```
 
@@ -179,7 +179,7 @@ const errorObject = error.toJSON()
 //   stack: '...',
 //   errors: [{ name: 'ExampleError', message: 'one', stack: '...' }, ...],
 // }
-const newError = AnyError.parse(errorObject)
+const newError = BaseError.parse(errorObject)
 // InputError: Wrong file.
 //   [errors]: [ExampleError: one, ExampleError: two]
 ```
@@ -197,8 +197,8 @@ preserve any arguments passed to their `constructor()` providing those are both:
 <!-- eslint-disable fp/no-this, fp/no-mutation -->
 
 ```js
-const InputError = AnyError.subclass('InputError', {
-  custom: class extends AnyError {
+const InputError = BaseError.subclass('InputError', {
+  custom: class extends BaseError {
     constructor(message, options, prop) {
       super(message, options, prop)
       this.prop = prop
@@ -210,7 +210,7 @@ const error = new InputError('Wrong file.', {}, true)
 const errorObject = error.toJSON()
 
 // This calls `new InputError('Wrong file.', {}, true)`
-const newError = AnyError.parse(errorObject)
+const newError = BaseError.parse(errorObject)
 ```
 
 # Related projects

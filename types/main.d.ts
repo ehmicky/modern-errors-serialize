@@ -7,7 +7,7 @@ export type { ErrorObject }
 /**
  * `modern-errors-serialize` plugin.
  *
- * This plugin adds `error.toJSON()` and `AnyError.parse()` to serialize/parse
+ * This plugin adds `error.toJSON()` and `BaseError.parse()` to serialize/parse
  * errors to plain objects.
  */
 declare const plugin: {
@@ -42,7 +42,7 @@ declare const plugin: {
      * @example
      * ```js
      * const newErrorObject = JSON.parse(errorString)
-     * const newError = AnyError.parse(newErrorObject)
+     * const newError = BaseError.parse(newErrorObject)
      * // InputError: Wrong file.
      * //     at ...
      * //   filePath: '...'

@@ -3,9 +3,9 @@ import { runInNewContext } from 'node:vm'
 import modernErrors from 'modern-errors'
 import modernErrorsSerialize from 'modern-errors-serialize'
 
-export const AnyError = modernErrors([modernErrorsSerialize])
-export const UnknownError = AnyError.subclass('UnknownError')
-export const TestError = AnyError.subclass('TestError')
+export const BaseError = modernErrors([modernErrorsSerialize])
+export const UnknownError = BaseError.subclass('UnknownError')
+export const TestError = BaseError.subclass('TestError')
 
 export const testError = new TestError('message')
 // eslint-disable-next-line fp/no-mutation
