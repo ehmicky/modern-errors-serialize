@@ -1,11 +1,12 @@
 import { serialize, parse as parseErrorObject } from 'error-serializer'
+import isPlainObject from 'is-plain-obj'
 
 // `error.toJSON()`
 const toJSON = function ({ error, instancesData }) {
-  beforeSerialize(error, instancesData)
-  const errorObject = serialize(error)
-  afterSerialize(error)
-  return errorObject
+  return serialize(error, {
+    beforeSerialize: beforeSerialize.bind(undefined, instancesData),
+    afterSerialize,
+  })
 }
 
 // Plugin options are kept in some undocumented `WeakMap` called `instancesData`
@@ -22,12 +23,18 @@ const toJSON = function ({ error, instancesData }) {
 //   deep and not calling `error.toJSON()`
 // - Users passing initial constructor arguments down, which is complicated when
 //   they also want to modify them
-const beforeSerialize = function (error, instancesData) {
+const beforeSerialize = function (instancesData, error) {
+  if (!instancesData.has(error)) {
+    return
+  }
+
   const { pluginsOpts } = instancesData.get(error)
 
-  if (Object.keys(pluginsOpts).length !== 0) {
-    error.pluginsOpts = pluginsOpts
+  if (Object.keys(pluginsOpts).length === 0) {
+    return
   }
+
+  error.pluginsOpts = pluginsOpts
 }
 
 const afterSerialize = function (error) {
@@ -40,7 +47,7 @@ const parse = function ({ ErrorClasses, instancesData }, value) {
   const classes = getClasses(ErrorClasses)
   return parseErrorObject(value, {
     classes,
-    afterParse: (errorObject, error) => afterParse(error, instancesData),
+    afterParse: afterParse.bind(undefined, instancesData),
   })
 }
 
@@ -52,8 +59,8 @@ const getClass = function (ErrorClass) {
   return [ErrorClass.name, ErrorClass]
 }
 
-const afterParse = function (error, instancesData) {
-  const { pluginsOpts } = error
+const afterParse = function (instancesData, errorObject, error) {
+  const pluginsOpts = isPlainObject(error.pluginsOpts) ? error.pluginsOpts : {}
   instancesData.set(error, { pluginsOpts })
   // eslint-disable-next-line fp/no-delete
   delete error.pluginsOpts
