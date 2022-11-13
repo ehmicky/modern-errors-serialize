@@ -1,5 +1,6 @@
 import { serialize, parse as parseErrorObject } from 'error-serializer'
 
+// `error.toJSON()`
 const toJSON = function ({ error, instancesData }) {
   beforeSerialize(error, instancesData)
   const errorObject = serialize(error)
@@ -7,6 +8,8 @@ const toJSON = function ({ error, instancesData }) {
   return errorObject
 }
 
+// Plugin options are kept in some undocumented `WeakMap` called `instancesData`
+// Those are kept by serializing them as a `pluginsOpts` property.
 const beforeSerialize = function (error, instancesData) {
   const { pluginsOpts } = instancesData.get(error)
 
@@ -20,6 +23,7 @@ const afterSerialize = function (error) {
   delete error.pluginsOpts
 }
 
+// `ErrorClass.parse()`
 const parse = function ({ ErrorClasses, instancesData }, value) {
   const classes = getClasses(ErrorClasses)
   return parseErrorObject(value, {
