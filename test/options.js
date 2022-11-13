@@ -11,11 +11,15 @@ each([true, { loose: 'true' }, { shallow: 'true' }], ({ title }, options) => {
   })
 })
 
-each(['serialize', 'parse'], ({ title }, methodName) => {
-  test(`Empty objects are not options | ${title}`, (t) => {
-    t.is(BaseError[methodName]({}).message, '{}')
-  })
+test('Empty objects are options when serializing', (t) => {
+  t.is(BaseError.serialize({}).message, '')
+})
 
+test('Empty objects are options when parsing', (t) => {
+  t.is(BaseError.parse({}).message, 'undefined')
+})
+
+each(['serialize', 'parse'], ({ title }, methodName) => {
   test(`Plain objects with non-option keys are not options | ${title}`, (t) => {
     t.is(BaseError[methodName]({ message: 'test' }).message, 'test')
   })

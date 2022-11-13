@@ -5,6 +5,21 @@ import type { Info, ErrorInstance } from 'modern-errors'
 export type { ErrorObject }
 
 /**
+ * Options of `modern-errors-serialize`
+ */
+export interface Options {
+  /**
+   *
+   */
+  readonly loose?: boolean
+
+  /**
+   *
+   */
+  readonly shallow?: boolean
+}
+
+/**
  * `modern-errors-serialize` plugin.
  *
  * This plugin adds `BaseError.toJSON()`, `BaseError.fromJSON()`,
@@ -13,6 +28,49 @@ export type { ErrorObject }
  */
 declare const plugin: {
   name: 'serialize'
+  getOptions: (options: Options) => Options
+  isOptions: (options: unknown) => boolean
+  staticMethods: {
+    /**
+     * This is like `BaseError.toJSON(value)` except, if `value` is not an error
+     * instance, it is kept as is. However, any nested error instances is still
+     * serialized.
+     *
+     * @example
+     * ```js
+     * const error = new InputError('Wrong file.')
+     * const deepArray = [{}, { error }]
+     *
+     * const jsonString = JSON.stringify(BaseError.serialize(deepArray))
+     * const newDeepArray = JSON.parse(jsonString)
+     *
+     * const newError = BaseError.parse(newDeepArray)[1].error
+     * // InputError: Wrong file.
+     * //     at ...
+     * ```
+     */
+    serialize: (info: Info['staticMethods'], error: unknown) => ErrorObject
+
+    /**
+     * This is like `BaseError.fromJSON(value)` except, if `value` is not an
+     * error plain object, it is kept as is. However, any nested error plain
+     * object is still parsed.
+     *
+     * @example
+     * ```js
+     * const error = new InputError('Wrong file.')
+     * const deepArray = [{}, { error }]
+     *
+     * const jsonString = JSON.stringify(BaseError.serialize(deepArray))
+     * const newDeepArray = JSON.parse(jsonString)
+     *
+     * const newError = BaseError.parse(newDeepArray)[1].error
+     * // InputError: Wrong file.
+     * //     at ...
+     * ```
+     */
+    parse: (info: Info['staticMethods'], errorObject: unknown) => ErrorInstance
+  }
   instanceMethods: {
     /**
      * Converts `error` to an error plain object that is
@@ -46,68 +104,6 @@ declare const plugin: {
      * ```
      */
     toJSON: (info: Info['instanceMethods']) => ErrorObject
-  }
-  staticMethods: {
-    /**
-     * Converts `errorObject` to an error instance.
-     * The original error classes are preserved.
-     *
-     * Nested error plain objects are parsed deeply. If `errorObject` is not an
-     * error plain object, it is first normalized to one.
-     *
-     * @example
-     * ```js
-     * const newErrorObject = JSON.parse(errorString)
-     * const newError = BaseError.fromJSON(newErrorObject)
-     * // InputError: Wrong file.
-     * //     at ...
-     * //   filePath: '...'
-     * ```
-     */
-    fromJSON: (
-      info: Info['staticMethods'],
-      errorObject: unknown,
-    ) => ErrorInstance
-
-    /**
-     * This is like `BaseError.toJSON(value)` except, if `value` is not an error
-     * instance, it is kept as is. However, any nested error instances is still
-     * serialized.
-     *
-     * @example
-     * ```js
-     * const error = new InputError('Wrong file.')
-     * const deepArray = [{}, { error }]
-     *
-     * const jsonString = JSON.stringify(BaseError.serialize(deepArray))
-     * const newDeepArray = JSON.parse(jsonString)
-     *
-     * const newError = BaseError.parse(newDeepArray)[1].error
-     * // InputError: Wrong file.
-     * //     at ...
-     * ```
-     */
-    serialize: (info: Info['staticMethods'], error: unknown) => unknown
-
-    /**
-     * This is like `BaseError.fromJSON(value)` except, if `value` is not an
-     * error plain object, it is kept as is. However, any nested error plain
-     * object is still parsed.
-     *
-     * @example
-     * ```js
-     * const error = new InputError('Wrong file.')
-     * const deepArray = [{}, { error }]
-     *
-     * const jsonString = JSON.stringify(BaseError.serialize(deepArray))
-     * const newDeepArray = JSON.parse(jsonString)
-     *
-     * const newError = BaseError.parse(newDeepArray)[1].error
-     * // InputError: Wrong file.
-     * //     at ...
-     * ```
-     */
-    parse: (info: Info['staticMethods'], errorObject: unknown) => unknown
   }
 }
 export default plugin

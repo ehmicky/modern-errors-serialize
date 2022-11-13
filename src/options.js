@@ -9,11 +9,7 @@ export const getOptions = function (options = {}) {
 
 // Only plain objects with valid option keys are considered options
 export const isOptions = function (value) {
-  return (
-    isPlainObject(value) &&
-    Object.keys(value).length !== 0 &&
-    Object.keys(value).every(isOptionKey)
-  )
+  return isPlainObject(value) && Object.keys(value).every(isOptionKey)
 }
 
 const isOptionKey = function (key) {
