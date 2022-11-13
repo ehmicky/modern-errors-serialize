@@ -1,3 +1,20 @@
+# 3.0.0
+
+## Breaking changes
+
+- `BaseError.toJSON()` was renamed to
+  [`BaseError.serialize()`](README.md#baseerrorserializeerror)
+- `BaseError.fromJSON()` was renamed to
+  [`BaseError.parse()`](README.md#baseerrorparseerrorobject)
+- When serializing/parsing a value that is not an error instance or an error
+  plain object, it is now automatically converted to one
+
+## Features
+
+- Added the [`shallow` option](README.md#shallow) to serialize/parse shallowly
+- Added the [`loose` option](README.md#loose) to prevent converting the argument
+  to an error instance or an error plain object if it is not one
+
 # 2.3.0
 
 ## Features
