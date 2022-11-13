@@ -8,82 +8,94 @@ import {
   parentNativeError,
   PluginError,
   getPluginErrorObject,
+  nonErrorObjects,
+  InvalidError,
 } from './helpers/main.js'
 
-test('ErrorClass.parse() parses error plain objects', (t) => {
-  t.deepEqual(BaseError.parse(BaseError.toJSON(baseError)), baseError)
+each(['parse', 'fromJSON'], ({ title }, methodName) => {
+  test(`ErrorClass.parse|fromJSON() parse error plain objects | ${title}`, (t) => {
+    t.deepEqual(BaseError[methodName](BaseError.toJSON(baseError)), baseError)
+  })
+
+  test(`ErrorClass.parse|fromJSON() keep error class | ${title}`, (t) => {
+    t.is(
+      BaseError[methodName](BaseError.toJSON(baseError)).constructor,
+      BaseError,
+    )
+  })
+
+  test(`ErrorClass.parse|fromJSON() parse native errors | ${title}`, (t) => {
+    const nativeErrorObject = BaseError.toJSON(parentNativeError).prop
+    const [nativeErrorCopy] = BaseError.parse([nativeErrorObject])
+    t.deepEqual(nativeErrorCopy, nativeError)
+    t.is(nativeErrorCopy.constructor, TypeError)
+  })
+
+  test(`ErrorClass.parse|fromJSON() handle constructors that throw | ${title}`, (t) => {
+    const invalidError = new InvalidError('message', {}, Symbol('test'))
+    t.true(
+      BaseError[methodName](InvalidError.toJSON(invalidError)) instanceof
+        BaseError,
+    )
+  })
+
+  test(`ErrorClass.parse|fromJSON() keep plugin options | ${title}`, (t) => {
+    const cause = PluginError[methodName](getPluginErrorObject('toJSON'))
+    t.false('pluginsOpts' in cause)
+    t.true(new PluginError('', { cause }).options)
+  })
+
+  test(`ErrorClass.parse|fromJSON() keeps plugin options deeply | ${title}`, (t) => {
+    const cause = PluginError[methodName]({
+      ...getPluginErrorObject('toJSON'),
+      cause: getPluginErrorObject('toJSON'),
+    })
+    t.true(new PluginError('', { cause }).options)
+  })
+
+  test(`ErrorClass.parse|fromJSON() is deep | ${title}`, (t) => {
+    t.deepEqual(
+      BaseError[methodName]({
+        ...getPluginErrorObject('toJSON'),
+        prop: [BaseError.toJSON(baseError)],
+      }).prop[0],
+      baseError,
+    )
+  })
 })
 
-test('ErrorClass.parse() keeps error class', (t) => {
-  t.is(BaseError.parse(BaseError.toJSON(baseError)).constructor, BaseError)
+each(nonErrorObjects, ({ title }, value) => {
+  test(`ErrorClass.parse() does not normalize top-level value | ${title}`, (t) => {
+    t.deepEqual(BaseError.parse(value), value)
+  })
+
+  test(`ErrorClass.fromJSON() normalizes top-level value | ${title}`, (t) => {
+    t.true(BaseError.fromJSON(value) instanceof BaseError)
+  })
 })
 
-test('ErrorClass.parse() is deep', (t) => {
-  t.deepEqual(
-    BaseError.parse([{ prop: BaseError.toJSON(baseError) }])[0].prop,
-    baseError,
-  )
-})
-
-test('ErrorClass.parse() parses native errors', (t) => {
-  const nativeErrorObject = BaseError.toJSON(parentNativeError).prop
-  const [nativeErrorCopy] = BaseError.parse([nativeErrorObject])
-  t.deepEqual(nativeErrorCopy, nativeError)
-  t.is(nativeErrorCopy.constructor, TypeError)
+each(['parse', 'fromJSON'], nonErrorObjects, ({ title }, methodName, value) => {
+  test(`ErrorClass.parse|fromJSON() do not normalize deep value | ${title}`, (t) => {
+    t.deepEqual(
+      BaseError[methodName]({
+        ...getPluginErrorObject('toJSON'),
+        prop: [value],
+      }).prop[0],
+      value,
+    )
+  })
 })
 
 each(
-  [undefined, null, true, {}, { name: 'Error' }, baseError, nativeError],
-  ({ title }, value) => {
-    test(`ErrorClass.parse() does not normalize top-level non-error plain objects | ${title}`, (t) => {
-      t.deepEqual(BaseError.parse(value), value)
-    })
-
-    test(`ErrorClass.parse() does not normalize deep non-error plain objects | ${title}`, (t) => {
-      t.deepEqual(BaseError.parse([value])[0], value)
+  ['parse', 'fromJSON'],
+  [undefined, true],
+  ({ title }, methodName, pluginsOpts) => {
+    test(`ErrorClass.parse|fromJSON() handle missing or invalid plugin options | ${title}`, (t) => {
+      const cause = PluginError[methodName]({
+        ...getPluginErrorObject('toJSON'),
+        pluginsOpts,
+      })
+      t.false('options' in new PluginError('', { cause }))
     })
   },
 )
-
-const InvalidError = BaseError.subclass('InvalidError', {
-  custom: class extends BaseError {
-    constructor(message, options, prop) {
-      if (typeof prop !== 'symbol') {
-        throw new TypeError('unsafe')
-      }
-
-      super(message, options, prop)
-    }
-  },
-})
-
-test('ErrorClass.parse() handles constructors that throw', (t) => {
-  const invalidError = new InvalidError('message', {}, Symbol('test'))
-  t.true(
-    BaseError.parse(InvalidError.toJSON(invalidError)) instanceof BaseError,
-  )
-})
-
-test('ErrorClass.parse() keeps plugin options', (t) => {
-  const cause = PluginError.parse(getPluginErrorObject('toJSON'))
-  t.false('pluginsOpts' in cause)
-  t.true(new PluginError('', { cause }).options)
-})
-
-test('ErrorClass.parse() keeps plugin options deeply', (t) => {
-  const cause = PluginError.parse({
-    ...getPluginErrorObject('toJSON'),
-    cause: getPluginErrorObject('toJSON'),
-  })
-  t.true(new PluginError('', { cause }).options)
-})
-
-each([undefined, true], ({ title }, pluginsOpts) => {
-  test(`ErrorClass.parse() handles missing or invalid plugin options | ${title}`, (t) => {
-    const cause = PluginError.parse({
-      ...getPluginErrorObject('toJSON'),
-      pluginsOpts,
-    })
-    t.false('options' in new PluginError('', { cause }))
-  })
-})

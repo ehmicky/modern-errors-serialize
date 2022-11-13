@@ -36,3 +36,25 @@ export const pluginError = new PluginError('message', { test: true })
 export const getPluginErrorObject = function (methodName) {
   return excludeKeys(PluginError[methodName](pluginError), ['options'])
 }
+
+export const nonErrorObjects = [
+  undefined,
+  null,
+  true,
+  {},
+  { name: 'Error' },
+  baseError,
+  nativeError,
+]
+
+export const InvalidError = BaseError.subclass('InvalidError', {
+  custom: class extends BaseError {
+    constructor(message, options, prop) {
+      if (typeof prop !== 'symbol') {
+        throw new TypeError('unsafe')
+      }
+
+      super(message, options, prop)
+    }
+  },
+})
