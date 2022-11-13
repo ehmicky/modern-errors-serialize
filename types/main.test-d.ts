@@ -6,7 +6,7 @@ import modernErrorsSerialize, { ErrorObject } from 'modern-errors-serialize'
 const BaseError = ModernError.subclass('BaseError', {
   plugins: [modernErrorsSerialize],
 })
-const error = new BaseError('', { cause: '' })
+const error = new BaseError('')
 const errorObject = error.toJSON()
 
 expectError(
