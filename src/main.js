@@ -16,6 +16,7 @@ const toJSON = function ({ error, instancesData }) {
 
 const serializeValue = function (value, instancesData) {
   return serializeToObject(value, {
+    loose: true,
     beforeSerialize: beforeSerialize.bind(undefined, instancesData),
     afterSerialize,
   })
@@ -81,6 +82,7 @@ const parseValue = function ({
 }) {
   const classes = getClasses(ErrorClasses)
   return parseFromObject(value, {
+    loose: true,
     classes,
     afterParse: afterParse.bind(undefined, { ErrorClass, instancesData }),
   })
