@@ -18,23 +18,6 @@ const PluginError = BaseError.subclass('PluginError', { plugins: [testPlugin] })
 const pluginError = new PluginError('message', { test: true })
 const pluginErrorObject = excludeKeys(pluginError.toJSON(), ['options'])
 
-const InvalidError = BaseError.subclass('InvalidError', {
-  custom: class extends BaseError {
-    constructor(message, options, prop) {
-      if (typeof prop !== 'symbol') {
-        throw new TypeError('unsafe')
-      }
-
-      super(message, options, prop)
-    }
-  },
-})
-
-test('ErrorClass.parse() handles constructors that throw', (t) => {
-  const invalidError = new InvalidError('message', {}, Symbol('test'))
-  t.true(BaseError.parse(invalidError.toJSON()) instanceof BaseError)
-})
-
 test('Serialization keeps plugin options', (t) => {
   t.true(pluginErrorObject.pluginsOpts.test)
 })
