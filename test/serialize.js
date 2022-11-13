@@ -58,6 +58,13 @@ each([baseError, nativeError], ({ title }, deepError) => {
       deepError,
     )
   })
+
+  test(`ErrorClass.serialize() can be deep and loose | ${title}`, (t) => {
+    t.deepEqual(
+      BaseError.serialize([error], { loose: true })[0].prop[0],
+      convertError(deepError),
+    )
+  })
 })
 
 test('error.toJSON() serializes', (t) => {

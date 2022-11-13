@@ -67,6 +67,15 @@ test('ErrorClass.parse() is not deep with "shallow: true"', (t) => {
   )
 })
 
+test('ErrorClass.parse() can be deep and loose', (t) => {
+  t.deepEqual(
+    BaseError.parse([{ ...pluginErrorObject, prop: [baseErrorObject] }], {
+      loose: true,
+    })[0].prop[0],
+    baseError,
+  )
+})
+
 each(nonErrorObjects, ({ title }, value) => {
   test(`ErrorClass.parse() does not normalize deep value | ${title}`, (t) => {
     t.deepEqual(

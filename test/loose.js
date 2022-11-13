@@ -12,11 +12,11 @@ test('ErrorClass.serialize() does not normalize the top-level value with "loose:
 })
 
 each(nonErrorObjects, ({ title }, value) => {
-  test(`ErrorClass.parse() normalizes top-level value by default | ${title}`, (t) => {
+  test(`ErrorClass.parse() normalizes the top-level value by default | ${title}`, (t) => {
     t.true(BaseError.parse(value) instanceof BaseError)
   })
 
-  test(`ErrorClass.parse() does not normalize top-level value with "loose: true" | ${title}`, (t) => {
+  test(`ErrorClass.parse() does not normalize the top-level value with "loose: true" | ${title}`, (t) => {
     t.deepEqual(BaseError.parse(value, { loose: true }), value)
   })
 })
