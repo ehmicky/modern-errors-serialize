@@ -4,53 +4,66 @@ import { each } from 'test-each'
 import {
   BaseError,
   baseError,
-  errorObject,
   nativeError,
   PluginError,
   pluginError,
-  pluginErrorObject,
+  getPluginErrorObject,
 } from './helpers/main.js'
 
 const convertError = function ({ name, message, stack, one }) {
   return { name, message, stack, one }
 }
 
-test('ErrorClass.toJSON() serializes', (t) => {
-  t.deepEqual(errorObject, convertError(baseError))
-})
+each(['toJSON', 'serialize'], ({ title }, methodName) => {
+  test(`ErrorClass.toJSON|serialize() serialize | ${title}`, (t) => {
+    t.deepEqual(BaseError[methodName](baseError), convertError(baseError))
+  })
 
-each([baseError, nativeError], ({ title }, deepError) => {
-  test(`ErrorClass.toJSON() is deep | ${title}`, (t) => {
-    const error = new BaseError('test')
-    error.prop = [deepError]
-    t.deepEqual(BaseError.toJSON(error).prop[0], convertError(deepError))
+  test(`ErrorClass.toJSON|serialize() keep plugin options | ${title}`, (t) => {
+    t.true(getPluginErrorObject(methodName).pluginsOpts.test)
+  })
+
+  test(`ErrorClass.toJSON|serialize() keep plugin options deeply | ${title}`, (t) => {
+    const error = new PluginError('message')
+    error.cause = new PluginError('causeMessage', { test: true })
+    t.true(PluginError[methodName](error).cause.pluginsOpts.test)
+  })
+
+  test(`ErrorClass.toJSON|serialize() do not keep plugin options of native errors | ${title}`, (t) => {
+    const error = new PluginError('message')
+    error.cause = new Error('causeMessage')
+    t.false('pluginsOpts' in PluginError[methodName](error).cause)
+  })
+
+  test(`ErrorClass.toJSON|serialize() do not keep empty plugin options | ${title}`, (t) => {
+    const error = new PluginError('message')
+    t.false('pluginsOpts' in PluginError[methodName](error))
+  })
+
+  test(`ErrorClass.toJSON|serialize() do not mutate error | ${title}`, (t) => {
+    PluginError[methodName](pluginError)
+    t.false('pluginsOpts' in pluginError)
   })
 })
 
-test('ErrorClass.toJSON() keeps plugin options', (t) => {
-  t.true(pluginErrorObject.pluginsOpts.test)
+each(
+  ['toJSON', 'serialize'],
+  [baseError, nativeError],
+  ({ title }, methodName, deepError) => {
+    test(`ErrorClass.toJSON|serialize() are deep | ${title}`, (t) => {
+      const error = new BaseError('test')
+      error.prop = [deepError]
+      t.deepEqual(BaseError[methodName](error).prop[0], convertError(deepError))
+    })
+  },
+)
+
+test('ErrorClass.serialize() does not normalize the top-level value', (t) => {
+  t.is(BaseError.serialize(''), '')
 })
 
-test('ErrorClass.toJSON() keeps plugin options deeply', (t) => {
-  const error = new PluginError('message')
-  error.cause = new PluginError('causeMessage', { test: true })
-  t.true(PluginError.toJSON(error).cause.pluginsOpts.test)
-})
-
-test('ErrorClass.toJSON() does not keep plugin options of native errors', (t) => {
-  const error = new PluginError('message')
-  error.cause = new Error('causeMessage')
-  t.false('pluginsOpts' in PluginError.toJSON(error).cause)
-})
-
-test('ErrorClass.toJSON() does not keep empty plugin options', (t) => {
-  const error = new PluginError('message')
-  t.false('pluginsOpts' in PluginError.toJSON(error))
-})
-
-test('ErrorClass.toJSON() does not mutate error', (t) => {
-  PluginError.toJSON(pluginError)
-  t.false('pluginsOpts' in pluginError)
+test('ErrorClass.toJSON() normalizes the top-level value', (t) => {
+  t.is(BaseError.toJSON('').name, BaseError.name)
 })
 
 test('error.toJSON() serializes', (t) => {

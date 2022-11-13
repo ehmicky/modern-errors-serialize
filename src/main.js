@@ -1,9 +1,21 @@
-import { serialize, parse as parseErrorObject } from 'error-serializer'
+import {
+  serialize as serializeToObject,
+  parse as parseFromObject,
+} from 'error-serializer'
 import isPlainObject from 'is-plain-obj'
+
+// `ErrorClass.serialize(error)`
+const serialize = function ({ instancesData }, value) {
+  return serializeValue(value, instancesData)
+}
 
 // `ErrorClass.toJSON(error)` or `error.toJSON()`
 const toJSON = function ({ error, instancesData }) {
-  return serialize(error, {
+  return serializeValue(error, instancesData)
+}
+
+const serializeValue = function (value, instancesData) {
+  return serializeToObject(value, {
     beforeSerialize: beforeSerialize.bind(undefined, instancesData),
     afterSerialize,
   })
@@ -45,7 +57,7 @@ const afterSerialize = function (error) {
 // `ErrorClass.parse()`
 const parse = function ({ ErrorClass, ErrorClasses, instancesData }, value) {
   const classes = getClasses(ErrorClasses)
-  return parseErrorObject(value, {
+  return parseFromObject(value, {
     classes,
     afterParse: afterParse.bind(undefined, { ErrorClass, instancesData }),
   })
@@ -81,5 +93,5 @@ const setPluginsOpts = function (ErrorClass, instancesData, error) {
 export default {
   name: 'serialize',
   instanceMethods: { toJSON },
-  staticMethods: { parse },
+  staticMethods: { serialize, parse },
 }

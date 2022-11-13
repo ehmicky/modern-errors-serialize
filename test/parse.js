@@ -4,26 +4,29 @@ import { each } from 'test-each'
 import {
   BaseError,
   baseError,
-  errorObject,
   nativeError,
-  nativeErrorObject,
+  parentNativeError,
   PluginError,
-  pluginErrorObject,
+  getPluginErrorObject,
 } from './helpers/main.js'
 
 test('ErrorClass.parse() parses error plain objects', (t) => {
-  t.deepEqual(BaseError.parse(errorObject), baseError)
+  t.deepEqual(BaseError.parse(BaseError.toJSON(baseError)), baseError)
 })
 
 test('ErrorClass.parse() keeps error class', (t) => {
-  t.is(BaseError.parse(errorObject).constructor, BaseError)
+  t.is(BaseError.parse(BaseError.toJSON(baseError)).constructor, BaseError)
 })
 
 test('ErrorClass.parse() is deep', (t) => {
-  t.deepEqual(BaseError.parse([{ prop: errorObject }])[0].prop, baseError)
+  t.deepEqual(
+    BaseError.parse([{ prop: BaseError.toJSON(baseError) }])[0].prop,
+    baseError,
+  )
 })
 
 test('ErrorClass.parse() parses native errors', (t) => {
+  const nativeErrorObject = BaseError.toJSON(parentNativeError).prop
   const [nativeErrorCopy] = BaseError.parse([nativeErrorObject])
   t.deepEqual(nativeErrorCopy, nativeError)
   t.is(nativeErrorCopy.constructor, TypeError)
@@ -62,22 +65,25 @@ test('ErrorClass.parse() handles constructors that throw', (t) => {
 })
 
 test('ErrorClass.parse() keeps plugin options', (t) => {
-  const cause = PluginError.parse(pluginErrorObject)
+  const cause = PluginError.parse(getPluginErrorObject('toJSON'))
   t.false('pluginsOpts' in cause)
   t.true(new PluginError('', { cause }).options)
 })
 
 test('ErrorClass.parse() keeps plugin options deeply', (t) => {
   const cause = PluginError.parse({
-    ...pluginErrorObject,
-    cause: pluginErrorObject,
+    ...getPluginErrorObject('toJSON'),
+    cause: getPluginErrorObject('toJSON'),
   })
   t.true(new PluginError('', { cause }).options)
 })
 
 each([undefined, true], ({ title }, pluginsOpts) => {
   test(`ErrorClass.parse() handles missing or invalid plugin options | ${title}`, (t) => {
-    const cause = PluginError.parse({ ...pluginErrorObject, pluginsOpts })
+    const cause = PluginError.parse({
+      ...getPluginErrorObject('toJSON'),
+      pluginsOpts,
+    })
     t.false('options' in new PluginError('', { cause }))
   })
 })
