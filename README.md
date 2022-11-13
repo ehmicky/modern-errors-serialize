@@ -27,7 +27,6 @@ to/from plain objects.
   `process.send()`)
 - Keeps [error classes](#baseerrorparseerrorobject)
 - Preserves errors' [additional properties](#additional-error-properties)
-- Can keep `custom` [constructor's arguments](#constructors-arguments)
 - Works [recursively](#aggregate-errors) with
   [`AggregateError`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AggregateError)
 - Safe: this never throws
@@ -100,14 +99,16 @@ etc.). This is
 [automatically called](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior)
 by `JSON.stringify()`. All error properties
 [are kept](https://github.com/ehmicky/error-serializer#additional-error-properties).
+[Plugin options](https://github.com/ehmicky/modern-errors#plugin-options) are
+also preserved.
 
-## BaseError.parse(errorObject)
+## BaseError.parse(value)
 
-`errorObject`: `ErrorObject`\
-_Return value_: `ErrorInstance`
+If `value` is an error plain object, converts it to an identical error instance.
+The original error class is preserved.
 
-Converts an error plain object back to an identical error instance. The original
-error class is preserved.
+Otherwise, [recurse](#deep-serializationparsing) over `value` and parse any
+nested error plain object.
 
 # Usage
 
@@ -187,15 +188,13 @@ const newError = BaseError.parse(errorObject)
 //   [errors]: [ExampleError: one, ExampleError: two]
 ```
 
-## Constructor's arguments
+## Constructors
 
-Error classes with a
-[`custom` option](https://github.com/ehmicky/modern-errors#-custom-logic)
-preserve any arguments passed to their `constructor()` providing those are both:
-
-- Forwarded as is to
-  [`super(...)`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/super)
-- Serializable with JSON
+If an error with a
+[`custom` class](https://github.com/ehmicky/modern-errors#-custom-logic), is
+parsed, its custom constructor is not called. However, any property previously
+set by that constructor is still preserved, providing it is serializable and
+enumerable.
 
 <!-- eslint-disable fp/no-this, fp/no-mutation -->
 
@@ -211,9 +210,8 @@ const InputError = BaseError.subclass('InputError', {
 
 const error = new InputError('Wrong file.', {}, true)
 const errorObject = error.toJSON()
-
-// This calls `new InputError('Wrong file.', {}, true)`
 const newError = BaseError.parse(errorObject)
+console.log(newError.prop) // true
 ```
 
 # Related projects
