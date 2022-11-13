@@ -43,11 +43,11 @@ const afterSerialize = function (error) {
 }
 
 // `ErrorClass.parse()`
-const parse = function ({ ErrorClasses, instancesData }, value) {
+const parse = function ({ ErrorClass, ErrorClasses, instancesData }, value) {
   const classes = getClasses(ErrorClasses)
   return parseErrorObject(value, {
     classes,
-    afterParse: afterParse.bind(undefined, instancesData),
+    afterParse: afterParse.bind(undefined, { ErrorClass, instancesData }),
   })
 }
 
@@ -59,11 +59,23 @@ const getClass = function (ErrorClass) {
   return [ErrorClass.name, ErrorClass]
 }
 
-const afterParse = function (instancesData, errorObject, error) {
-  const pluginsOpts = isPlainObject(error.pluginsOpts) ? error.pluginsOpts : {}
-  instancesData.set(error, { pluginsOpts })
+const afterParse = function (
+  { ErrorClass, instancesData },
+  errorObject,
+  error,
+) {
+  setPluginsOpts(ErrorClass, instancesData, error)
   // eslint-disable-next-line fp/no-delete
   delete error.pluginsOpts
+}
+
+const setPluginsOpts = function (ErrorClass, instancesData, error) {
+  if (!(error instanceof ErrorClass)) {
+    return
+  }
+
+  const pluginsOpts = isPlainObject(error.pluginsOpts) ? error.pluginsOpts : {}
+  instancesData.set(error, { pluginsOpts })
 }
 
 export default {
