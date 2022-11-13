@@ -1,10 +1,11 @@
-import { getOptions } from './options.js'
+import { getOptions, isOptions } from './options.js'
 import { parse } from './parse.js'
-import { serialize } from './serialize.js'
+import { serialize, toJSON } from './serialize.js'
 
 export default {
   name: 'serialize',
   getOptions,
+  isOptions,
   staticMethods: { serialize, parse },
-  instanceMethods: { toJSON: serialize },
+  instanceMethods: { toJSON },
 }

@@ -1,17 +1,18 @@
 import { validateOptions } from 'error-serializer'
+import isPlainObject from 'is-plain-obj'
 
 // Retrieve options
 export const getOptions = function (options = {}) {
   validateOptions(options)
-  const { loose, shallow, ...unknownOptions } = options
-  validateUnknownOptions(unknownOptions)
-  return { loose, shallow }
+  return options
 }
 
-const validateUnknownOptions = function (unknownOptions) {
-  const [unknownOption] = Object.keys(unknownOptions)
-
-  if (unknownOption !== undefined) {
-    throw new TypeError(`Option "${unknownOption}" is unknown.`)
-  }
+export const isOptions = function (value) {
+  return isPlainObject(value) && Object.keys(value).every(isOptionKey)
 }
+
+const isOptionKey = function (key) {
+  return OPTIONS_KEYS.has(key)
+}
+
+const OPTIONS_KEYS = new Set(['loose', 'shallow'])

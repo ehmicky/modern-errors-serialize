@@ -14,41 +14,49 @@ const convertError = function ({ name, message, stack, one }) {
   return { name, message, stack, one }
 }
 
-test('ErrorClass.serialize() serialize', (t) => {
+test('ErrorClass.serialize() serializes', (t) => {
   t.deepEqual(BaseError.serialize(baseError), convertError(baseError))
 })
 
-test('ErrorClass.serialize() keep plugin options', (t) => {
+test('ErrorClass.serialize() keeps plugin options', (t) => {
   t.true(pluginErrorObject.pluginsOpts.test)
 })
 
-test('ErrorClass.serialize() keep plugin options deeply', (t) => {
+test('ErrorClass.serialize() keeps plugin options deeply', (t) => {
   const error = new PluginError('message')
   error.cause = new PluginError('causeMessage', { test: true })
   t.true(PluginError.serialize(error).cause.pluginsOpts.test)
 })
 
-test('ErrorClass.serialize() do not keep plugin options of native errors', (t) => {
+test('ErrorClass.serialize() does not keep plugin options of native errors', (t) => {
   const error = new PluginError('message')
   error.cause = new Error('causeMessage')
   t.false('pluginsOpts' in PluginError.serialize(error).cause)
 })
 
-test('ErrorClass.serialize() do not keep empty plugin options', (t) => {
+test('ErrorClass.serialize() does not keep empty plugin options', (t) => {
   const error = new PluginError('message')
   t.false('pluginsOpts' in PluginError.serialize(error))
 })
 
-test('ErrorClass.serialize() do not mutate error', (t) => {
+test('ErrorClass.serialize() does not mutate error', (t) => {
   PluginError.serialize(pluginError)
   t.false('pluginsOpts' in pluginError)
 })
 
 each([baseError, nativeError], ({ title }, deepError) => {
-  test(`ErrorClass.serialize() are deep | ${title}`, (t) => {
-    const error = new BaseError('test')
-    error.prop = [deepError]
+  const error = new BaseError('test')
+  error.prop = [deepError]
+
+  test(`ErrorClass.serialize() is deep by default | ${title}`, (t) => {
     t.deepEqual(BaseError.serialize(error).prop[0], convertError(deepError))
+  })
+
+  test(`ErrorClass.serialize() is not deep with "shallow: true" | ${title}`, (t) => {
+    t.deepEqual(
+      BaseError.serialize(error, { shallow: true }).prop[0],
+      deepError,
+    )
   })
 })
 
