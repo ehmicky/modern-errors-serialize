@@ -49,6 +49,27 @@ declare const plugin: {
   }
   staticMethods: {
     /**
+     * Converts `errorObject` to an error instance.
+     * The original error classes are preserved.
+     *
+     * Nested error plain objects are parsed deeply. If `errorObject` is not an
+     * error plain object, it is first normalized to one.
+     *
+     * @example
+     * ```js
+     * const newErrorObject = JSON.parse(errorString)
+     * const newError = BaseError.fromJSON(newErrorObject)
+     * // InputError: Wrong file.
+     * //     at ...
+     * //   filePath: '...'
+     * ```
+     */
+    fromJSON: (
+      info: Info['staticMethods'],
+      errorObject: unknown,
+    ) => ErrorInstance
+
+    /**
      * This is like `BaseError.toJSON(value)` except, if `value` is not an error
      * instance, it is kept as is. However, any nested error instances is still
      * serialized.
@@ -87,27 +108,6 @@ declare const plugin: {
      * ```
      */
     parse: (info: Info['staticMethods'], errorObject: unknown) => unknown
-
-    /**
-     * Converts `errorObject` to an error instance.
-     * The original error classes are preserved.
-     *
-     * Nested error plain objects are parsed deeply. If `errorObject` is not an
-     * error plain object, it is first normalized to one.
-     *
-     * @example
-     * ```js
-     * const newErrorObject = JSON.parse(errorString)
-     * const newError = BaseError.fromJSON(newErrorObject)
-     * // InputError: Wrong file.
-     * //     at ...
-     * //   filePath: '...'
-     * ```
-     */
-    fromJSON: (
-      info: Info['staticMethods'],
-      errorObject: unknown,
-    ) => ErrorInstance
   }
 }
 export default plugin
