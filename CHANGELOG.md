@@ -1,3 +1,10 @@
+# 2.3.0
+
+## Features
+
+- Added [`error.fromJSON()`](README.md#baseerrorfromjsonerrorobject) and
+  [`error.serialize()`](README.md#baseerrorserializevalue)
+
 # 2.2.0
 
 ## Features
