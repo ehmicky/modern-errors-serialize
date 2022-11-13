@@ -1,13 +1,20 @@
 import { expectType, expectError } from 'tsd'
 
-import modernErrors, { ErrorInstance } from 'modern-errors'
+import ModernError, { ErrorInstance } from 'modern-errors'
 import modernErrorsSerialize, { ErrorObject } from 'modern-errors-serialize'
 
-const BaseError = modernErrors([modernErrorsSerialize])
+const BaseError = ModernError.subclass('BaseError', {
+  plugins: [modernErrorsSerialize],
+})
 const error = new BaseError('', { cause: '' })
 const errorObject = error.toJSON()
 
-expectError(modernErrors([modernErrorsSerialize], { serialize: undefined }))
+expectError(
+  ModernError.subclass('TestError', {
+    plugins: [modernErrorsSerialize],
+    serialize: undefined,
+  }),
+)
 expectError(error.toJSON(undefined))
 expectError(BaseError.parse(errorObject, undefined))
 
