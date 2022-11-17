@@ -38,10 +38,12 @@ to/from plain objects.
 [`modern-errors`](https://github.com/ehmicky/modern-errors).
 
 ```js
-import modernErrors from 'modern-errors'
+import ModernError from 'modern-errors'
 import modernErrorsSerialize from 'modern-errors-serialize'
 
-export const BaseError = modernErrors([modernErrorsSerialize])
+export const BaseError = ModernError.subclass('BaseError', {
+  plugins: [modernErrorsSerialize],
+})
 // ...
 ```
 
@@ -84,7 +86,7 @@ not `require()`.
 _Type_: `Plugin`
 
 Plugin object to
-[pass to `modernErrors()`](https://github.com/ehmicky/modern-errors#adding-plugins).
+[pass to the `plugins` option of `ErrorClass.subclass()`](https://github.com/ehmicky/modern-errors#adding-plugins).
 
 ## error.toJSON()
 
