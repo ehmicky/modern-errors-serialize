@@ -85,8 +85,9 @@ not `require()`.
 
 _Type_: `Plugin`
 
-Plugin object to
-[pass to the `plugins` option of `ErrorClass.subclass()`](https://github.com/ehmicky/modern-errors#adding-plugins).
+Plugin object to pass to the
+[`plugins` option](https://github.com/ehmicky/modern-errors#adding-plugins) of
+`ErrorClass.subclass()`.
 
 ## error.toJSON()
 
