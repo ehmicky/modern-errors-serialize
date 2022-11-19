@@ -98,9 +98,7 @@ _Return value_: `ErrorObject`
 Converts `error` to an error plain object that is
 [serializable](https://github.com/ehmicky/error-serializer#json-safety) to JSON
 ([or YAML](https://github.com/ehmicky/error-serializer#custom-serializationparsing),
-etc.).
-
-All
+etc.). All
 [error properties](https://github.com/ehmicky/error-serializer#additional-error-properties)
 are kept.
 [Plugin options](https://github.com/ehmicky/modern-errors#plugin-options) are
@@ -121,9 +119,8 @@ automatically calls it.
 `errorObject`: `ErrorObject`\
 _Return value_: `ErrorInstance`
 
-Converts `errorObject` to an error instance.
-
-The original error classes are preserved.
+Converts `errorObject` to an error instance. The original error classes are
+preserved.
 
 [Nested](#deep-serializationparsing) error plain objects are also parsed. If
 `errorObject` is not an error plain object, it is first normalized to one.
