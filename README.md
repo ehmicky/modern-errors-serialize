@@ -15,11 +15,11 @@
 [plugin](https://github.com/ehmicky/modern-errors#-plugins) to serialize/parse
 errors.
 
-This adds [`BaseError.serialize()`](#baseerrorserializevalue),
-[`BaseError.parse()`](#baseerrorparseerrorobject),
-[`BaseError.toJSON()`](#baseerrortojsonerror) and
-[`BaseError.fromJSON()`](#baseerrorfromjsonerrorobject) to serialize/parse
-errors to/from plain objects.
+This adds [`BaseError.toJSON()`](#baseerrortojsonerror),
+[`BaseError.fromJSON()`](#baseerrorfromjsonerrorobject),
+[`BaseError.serialize()`](#baseerrorserializevalue) and
+[`BaseError.parse()`](#baseerrorparsevalue) to serialize/parse errors to/from
+plain objects.
 
 # Features
 
