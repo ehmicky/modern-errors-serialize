@@ -54,8 +54,6 @@ export const BaseError = ModernError.subclass('BaseError', {
 const error = new InputError('Wrong file.', { props: { filePath } })
 const errorObject = BaseError.toJSON(error)
 // { name: 'InputError', message: 'Wrong file', stack: '...', filePath: '...' }
-const errorString = JSON.stringify(error)
-// '{"name":"InputError",...}'
 ```
 
 [Parsing](#baseerrorfromjsonerrorobject) errors from plain objects.
