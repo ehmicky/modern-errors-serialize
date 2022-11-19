@@ -104,7 +104,7 @@ are kept.
 [Plugin options](https://github.com/ehmicky/modern-errors#plugin-options) are
 also preserved.
 
-[Nested](#deep-serializationparsing) error instances are also serialized. If
+[Nested](#deep-serializationparsing) error instances are serialized deeply. If
 `error` is not an error instance, it is first
 [normalized](https://github.com/ehmicky/modern-errors#invalid-errors) to one.
 
@@ -122,7 +122,7 @@ _Return value_: `ErrorInstance`
 Converts `errorObject` to an error instance. The original error classes are
 preserved.
 
-[Nested](#deep-serializationparsing) error plain objects are also parsed. If
+[Nested](#deep-serializationparsing) error plain objects are parsed deeply. If
 `errorObject` is not an error plain object, it is first normalized to one.
 
 ## BaseError.serialize(value)
