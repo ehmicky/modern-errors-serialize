@@ -109,8 +109,8 @@ also preserved.
 [normalized](https://github.com/ehmicky/modern-errors#invalid-errors) to one.
 
 This is also set as
-[`error.toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior),
-so
+[`error.toJSON()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#tojson_behavior).
+Therefore
 [`JSON.stringify()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
 automatically calls it.
 
