@@ -128,13 +128,13 @@ preserved.
 ## BaseError.serialize(value)
 
 This is like [`BaseError.toJSON(value)`](#baseerrortojsonerror) except, if
-`error` is not an error instance, it is not converted to an error plain object.
+`value` is not an error instance, it is not converted to an error plain object.
 However, any nested error instances is still serialized.
 
 ## BaseError.parse(value)
 
 This is like [`BaseError.fromJSON(value)`](#baseerrorfromjsonerrorobject)
-except, if `error` is not an error plain object, it is not converted to an error
+except, if `value` is not an error plain object, it is not converted to an error
 instance. However, any nested error plain object is still parsed.
 
 # Usage
