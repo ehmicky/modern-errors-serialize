@@ -11,7 +11,7 @@ import {
   pluginErrorObject,
   nonErrorObjects,
   InvalidError,
-} from './helpers/main.js'
+} from './helpers/main.test.js'
 
 test('ErrorClass.parse() parses error plain objects', (t) => {
   t.deepEqual(BaseError.parse(baseErrorObject), baseError)

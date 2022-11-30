@@ -8,7 +8,7 @@ import {
   PluginError,
   pluginError,
   pluginErrorObject,
-} from './helpers/main.js'
+} from './helpers/main.test.js'
 
 const convertError = function ({ name, message, stack, one }) {
   return { name, message, stack, one }

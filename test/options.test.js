@@ -1,7 +1,7 @@
 import test from 'ava'
 import { each } from 'test-each'
 
-import { BaseError } from './helpers/main.js'
+import { BaseError } from './helpers/main.test.js'
 
 each([true, { loose: 'true' }, { shallow: 'true' }], ({ title }, options) => {
   test(`Options are validated | ${title}`, (t) => {

@@ -1,7 +1,7 @@
 import test from 'ava'
 import { each } from 'test-each'
 
-import { BaseError, nonErrorObjects } from './helpers/main.js'
+import { BaseError, nonErrorObjects } from './helpers/main.test.js'
 
 test('ErrorClass.serialize() normalizes the top-level value by default', (t) => {
   t.is(BaseError.serialize('').name, BaseError.name)
