@@ -1,5 +1,4 @@
 import type { ErrorObject } from 'error-serializer'
-
 import type { Info, ErrorInstance } from 'modern-errors'
 
 export type { ErrorObject }
