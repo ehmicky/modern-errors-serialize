@@ -4,10 +4,10 @@ import isPlainObject from 'is-plain-obj'
 import { applyLoose } from './loose.js'
 
 // `ErrorClass.parse(value)`
-export const parse = function (
+export const parse = (
   { ErrorClass, ErrorClasses, instancesData, options: { loose, shallow } },
   value,
-) {
+) => {
   const classes = getClasses(ErrorClasses)
   const valueA = parseFromObject(value, {
     loose,
@@ -18,25 +18,18 @@ export const parse = function (
   return applyLoose(valueA, loose, ErrorClass)
 }
 
-const getClasses = function (ErrorClasses) {
-  return Object.fromEntries(ErrorClasses.map(getClass))
-}
+const getClasses = (ErrorClasses) =>
+  Object.fromEntries(ErrorClasses.map(getClass))
 
-const getClass = function (ErrorClass) {
-  return [ErrorClass.name, ErrorClass]
-}
+const getClass = (ErrorClass) => [ErrorClass.name, ErrorClass]
 
-const afterParse = function (
-  { ErrorClass, instancesData },
-  errorObject,
-  error,
-) {
+const afterParse = ({ ErrorClass, instancesData }, errorObject, error) => {
   setPluginsOpts(ErrorClass, instancesData, error)
   // eslint-disable-next-line fp/no-delete
   delete error.pluginsOpts
 }
 
-const setPluginsOpts = function (ErrorClass, instancesData, error) {
+const setPluginsOpts = (ErrorClass, instancesData, error) => {
   if (!(error instanceof ErrorClass)) {
     return
   }

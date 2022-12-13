@@ -3,29 +3,14 @@ import { serialize as serializeToObject } from 'error-serializer'
 import { applyLoose } from './loose.js'
 
 // `ErrorClass.serialize(value)`
-export const serialize = function (
-  { ErrorClass, instancesData, errorInfo },
-  value,
-) {
-  return serializeValue({ ErrorClass, instancesData, errorInfo, value })
-}
+export const serialize = ({ ErrorClass, instancesData, errorInfo }, value) =>
+  serializeValue({ ErrorClass, instancesData, errorInfo, value })
 
 // `error.toJSON()`
-export const toJSON = function ({
-  ErrorClass,
-  instancesData,
-  errorInfo,
-  error,
-}) {
-  return serializeValue({ ErrorClass, instancesData, errorInfo, value: error })
-}
+export const toJSON = ({ ErrorClass, instancesData, errorInfo, error }) =>
+  serializeValue({ ErrorClass, instancesData, errorInfo, value: error })
 
-const serializeValue = function ({
-  ErrorClass,
-  instancesData,
-  errorInfo,
-  value,
-}) {
+const serializeValue = ({ ErrorClass, instancesData, errorInfo, value }) => {
   const {
     options: { loose, shallow },
   } = errorInfo(value)
@@ -52,7 +37,7 @@ const serializeValue = function ({
 //   deep and not calling `error.toJSON()`
 // - Users passing initial constructor arguments down, which is complicated when
 //   they also want to modify them
-const beforeSerialize = function (instancesData, error) {
+const beforeSerialize = (instancesData, error) => {
   if (!instancesData.has(error)) {
     return
   }
@@ -66,7 +51,7 @@ const beforeSerialize = function (instancesData, error) {
   error.pluginsOpts = pluginsOpts
 }
 
-const afterSerialize = function (error) {
+const afterSerialize = (error) => {
   // eslint-disable-next-line fp/no-delete
   delete error.pluginsOpts
 }

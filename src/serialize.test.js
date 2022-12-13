@@ -10,9 +10,12 @@ import {
   pluginErrorObject,
 } from './helpers/main.test.js'
 
-const convertError = function ({ name, message, stack, one }) {
-  return { name, message, stack, one }
-}
+const convertError = ({ name, message, stack, one }) => ({
+  name,
+  message,
+  stack,
+  one,
+})
 
 test('ErrorClass.serialize() serializes', (t) => {
   t.deepEqual(BaseError.serialize(baseError), convertError(baseError))

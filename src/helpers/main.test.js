@@ -23,12 +23,8 @@ export const nativeErrorObject = BaseError.serialize(parentNativeError).prop
 
 const testPlugin = {
   name: 'test',
-  getOptions(options) {
-    return options
-  },
-  properties({ options }) {
-    return { options }
-  },
+  getOptions: (options) => options,
+  properties: ({ options }) => ({ options }),
 }
 
 export const PluginError = BaseError.subclass('PluginError', {
