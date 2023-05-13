@@ -1,9 +1,10 @@
 import ModernError, { type ErrorInstance } from 'modern-errors'
+import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
+
 import modernErrorsSerialize, {
   type ErrorObject,
   type Options,
 } from 'modern-errors-serialize'
-import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
 
 const BaseError = ModernError.subclass('BaseError', {
   plugins: [modernErrorsSerialize],
