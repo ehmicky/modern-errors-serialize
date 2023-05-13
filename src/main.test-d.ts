@@ -5,7 +5,6 @@ import modernErrorsSerialize, {
 } from 'modern-errors-serialize'
 import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
 
-
 const BaseError = ModernError.subclass('BaseError', {
   plugins: [modernErrorsSerialize],
 })
