@@ -42,7 +42,10 @@
   ],
   "license": "MIT",
   "homepage": "https://www.github.com/ehmicky/modern-errors-serialize",
-  "repository": "ehmicky/modern-errors-serialize",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ehmicky/modern-errors-serialize.git"
+  },
   "bugs": {
     "url": "https://github.com/ehmicky/modern-errors-serialize/issues"
   },
