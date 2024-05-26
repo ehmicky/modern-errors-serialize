@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@ehmicky/dev-tasks": "^2.0.111",
-    "filter-obj": "^5.1.0",
+    "filter-obj": "^6.1.0",
     "test-each": "^7.0.0"
   },
   "peerDependencies": {
