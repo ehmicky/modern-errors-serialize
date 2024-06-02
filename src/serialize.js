@@ -12,15 +12,27 @@ export const toJSON = ({ ErrorClass, instancesData, errorInfo, error }) =>
 
 const serializeValue = ({ ErrorClass, instancesData, errorInfo, value }) => {
   const {
-    options: { loose, shallow },
+    options: { loose, shallow, transformObject },
   } = errorInfo(value)
   const valueA = applyLoose(value, loose, ErrorClass)
   return serializeToObject(valueA, {
     loose,
     shallow,
-    beforeSerialize: beforeSerialize.bind(undefined, instancesData),
-    afterSerialize,
+    transformObject: applyTransformObject.bind(undefined, {
+      instancesData,
+      transformObject,
+    }),
   })
+}
+
+// Apply `transformObject` option
+const applyTransformObject = (
+  { instancesData, transformObject },
+  errorObject,
+  error,
+) => {
+  serializePluginsOpts(errorObject, error, instancesData)
+  transformObject?.(errorObject, error)
 }
 
 // Plugin options are kept in some undocumented `WeakMap` called `instancesData`
@@ -37,21 +49,15 @@ const serializeValue = ({ ErrorClass, instancesData, errorInfo, value }) => {
 //   deep and not calling `error.toJSON()`
 // - Users passing initial constructor arguments down, which is complicated when
 //   they also want to modify them
-const beforeSerialize = (instancesData, error) => {
+const serializePluginsOpts = (errorObject, error, instancesData) => {
   if (!instancesData.has(error)) {
     return
   }
 
   const { pluginsOpts } = instancesData.get(error)
 
-  if (Object.keys(pluginsOpts).length === 0) {
-    return
+  if (Object.keys(pluginsOpts).length !== 0) {
+    // eslint-disable-next-line no-param-reassign, fp/no-mutation
+    errorObject.pluginsOpts = pluginsOpts
   }
-
-  error.pluginsOpts = pluginsOpts
-}
-
-const afterSerialize = (error) => {
-  // eslint-disable-next-line fp/no-delete
-  delete error.pluginsOpts
 }

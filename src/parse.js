@@ -5,7 +5,12 @@ import { applyLoose } from './loose.js'
 
 // `ErrorClass.parse(value)`
 export const parse = (
-  { ErrorClass, ErrorClasses, instancesData, options: { loose, shallow } },
+  {
+    ErrorClass,
+    ErrorClasses,
+    instancesData,
+    options: { loose, shallow, transformArgs, transformInstance },
+  },
   value,
 ) => {
   const classes = getClasses(ErrorClasses)
@@ -13,7 +18,16 @@ export const parse = (
     loose,
     shallow,
     classes,
-    afterParse: afterParse.bind(undefined, { ErrorClass, instancesData }),
+    transformArgs: applyTransformArgs.bind(undefined, {
+      ErrorClass,
+      instancesData,
+      transformArgs,
+    }),
+    transformInstance: applyTransformInstance.bind(undefined, {
+      ErrorClass,
+      instancesData,
+      transformInstance,
+    }),
   })
   return applyLoose(valueA, loose, ErrorClass)
 }
@@ -23,17 +37,52 @@ const getClasses = (ErrorClasses) =>
 
 const getClass = (ErrorClass) => [ErrorClass.name, ErrorClass]
 
-const afterParse = ({ ErrorClass, instancesData }, errorObject, error) => {
-  setPluginsOpts(ErrorClass, instancesData, error)
-  // eslint-disable-next-line fp/no-delete
-  delete error.pluginsOpts
+// Apply `transformArgs` option
+const applyTransformArgs = (
+  { ErrorClass, transformArgs },
+  constructorArgs,
+  errorObject,
+  ErrorClassArg,
+  // eslint-disable-next-line max-params
+) => {
+  parsePluginsOpts({ constructorArgs, errorObject, ErrorClass, ErrorClassArg })
+  transformArgs?.(constructorArgs, errorObject, ErrorClassArg)
 }
 
-const setPluginsOpts = (ErrorClass, instancesData, error) => {
-  if (!(error instanceof ErrorClass)) {
+// Parse `pluginsOpts`, to keep plugin options
+const parsePluginsOpts = ({
+  constructorArgs,
+  errorObject: { pluginsOpts },
+  ErrorClass,
+  ErrorClassArg,
+}) => {
+  if (!hasPluginsOpts(pluginsOpts, ErrorClass, ErrorClassArg)) {
     return
   }
 
-  const pluginsOpts = isPlainObject(error.pluginsOpts) ? error.pluginsOpts : {}
-  instancesData.set(error, { pluginsOpts })
+  const argsIndex = constructorArgs.findLastIndex(isPlainObject)
+
+  if (argsIndex === -1) {
+    // eslint-disable-next-line fp/no-mutating-methods
+    constructorArgs.push(pluginsOpts)
+  } else {
+    // eslint-disable-next-line fp/no-mutation, no-param-reassign
+    constructorArgs[argsIndex] = {
+      ...pluginsOpts,
+      ...constructorArgs[argsIndex],
+    }
+  }
+}
+
+const hasPluginsOpts = (pluginsOpts, ErrorClass, ErrorClassArg) =>
+  isPlainObject(pluginsOpts) &&
+  (ErrorClass === ErrorClassArg || isProto.call(ErrorClass, ErrorClassArg))
+
+const { isPrototypeOf: isProto } = Object.prototype
+
+// Apply `transformInstance` option
+const applyTransformInstance = ({ transformInstance }, error, errorObject) => {
+  // eslint-disable-next-line fp/no-delete
+  delete error.pluginsOpts
+  transformInstance?.(error, errorObject)
 }

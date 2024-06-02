@@ -1,3 +1,17 @@
+# 6.1.0
+
+## Features
+
+- Add the
+  [`transformObject(errorObject)`](README.md#transformobjecterrorobject-errorinstance)
+  option to transform the error plain object during serialization
+- Add the
+  [`transformArgs(constructorArgs)`](README.md#transformargsconstructorargs-errorobject-errorclass)
+  option to transform the error message during parsing
+- Add the
+  [`transformInstance(errorInstance)`](README.md#transforminstanceerrorinstance-errorobject)
+  option to transform the error instance during parsing
+
 # 6.0.0
 
 ## Breaking changes

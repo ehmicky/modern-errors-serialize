@@ -13,4 +13,10 @@ export const isOptions = (value) =>
 
 const isOptionKey = (key) => OPTIONS_KEYS.has(key)
 
-const OPTIONS_KEYS = new Set(['loose', 'shallow'])
+const OPTIONS_KEYS = new Set([
+  'loose',
+  'shallow',
+  'transformObject',
+  'transformArgs',
+  'transformInstance',
+])

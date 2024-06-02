@@ -30,9 +30,17 @@ const testPlugin = {
 export const PluginError = BaseError.subclass('PluginError', {
   plugins: [testPlugin],
 })
-export const pluginError = new PluginError('message', { test: true })
+export const pluginErrorOpts = { test: true }
+export const pluginError = new PluginError('message', pluginErrorOpts)
 export const pluginErrorObject = excludeKeys(
   PluginError.serialize(pluginError),
+  ['options'],
+)
+
+export const PluginChildError = PluginError.subclass('PluginChildError')
+const pluginChildError = new PluginChildError('message', pluginErrorOpts)
+export const pluginChildErrorObject = excludeKeys(
+  PluginChildError.serialize(pluginChildError),
   ['options'],
 )
 

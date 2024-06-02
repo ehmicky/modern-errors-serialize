@@ -1,4 +1,8 @@
-import type { ErrorObject } from 'error-serializer'
+import type {
+  ErrorObject,
+  SerializeOptions,
+  ParseOptions,
+} from 'error-serializer'
 import type { Info, ErrorInstance } from 'modern-errors'
 
 export type { ErrorObject }
@@ -45,6 +49,125 @@ export interface Options {
    * ```
    */
   readonly shallow?: boolean
+
+  /**
+   * During serialization, transform each error plain object.
+   *
+   * `errorObject` is the error after serialization. It must be directly mutated.
+   *
+   * `errorInstance` is the error before serialization.
+   *
+   * @example
+   * ```js
+   * const errors = [new ExampleError('message secret')]
+   * errors[0].date = new Date()
+   *
+   * const errorObjects = BaseError.serialize(errors, {
+   *   loose: true,
+   *   // Serialize `Date` instances as strings
+   *   transformObject: (errorObject) => {
+   *     errorObject.date = errorObject.date.toString()
+   *   },
+   * })
+   * console.log(errorObjects[0].date) // Date string
+   *
+   * const newErrors = BaseError.parse(errorObjects, {
+   *   loose: true,
+   *   // Transform error message
+   *   transformArgs: (constructorArgs) => {
+   *     constructorArgs[0] = constructorArgs[0].replace('secret', '***')
+   *   },
+   *   // Parse date strings as `Date` instances
+   *   transformInstance: (error) => {
+   *     error.date = new Date(error.date)
+   *   },
+   * })
+   * console.log(newErrors[0].message) // 'message ***'
+   * console.log(newErrors[0].date) // `Date` instance
+   * ```
+   */
+  readonly transformObject?: SerializeOptions['transformObject']
+
+  /**
+   * During parsing, transform the arguments passed to each `new Error()`.
+   *
+   * `constructorArgs` is the array of arguments. Usually, `constructorArgs[0]`
+   * is the
+   * [error message](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/message)
+   * and `constructorArgs[1]` is the
+   * [constructor options object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/Error#parameters).
+   * `constructorArgs` must be directly mutated.
+   *
+   * `errorObject` is the error before parsing. `ErrorClass` is its class.
+   *
+   * @example
+   * ```js
+   * const errors = [new ExampleError('message secret')]
+   * errors[0].date = new Date()
+   *
+   * const errorObjects = BaseError.serialize(errors, {
+   *   loose: true,
+   *   // Serialize `Date` instances as strings
+   *   transformObject: (errorObject) => {
+   *     errorObject.date = errorObject.date.toString()
+   *   },
+   * })
+   * console.log(errorObjects[0].date) // Date string
+   *
+   * const newErrors = BaseError.parse(errorObjects, {
+   *   loose: true,
+   *   // Transform error message
+   *   transformArgs: (constructorArgs) => {
+   *     constructorArgs[0] = constructorArgs[0].replace('secret', '***')
+   *   },
+   *   // Parse date strings as `Date` instances
+   *   transformInstance: (error) => {
+   *     error.date = new Date(error.date)
+   *   },
+   * })
+   * console.log(newErrors[0].message) // 'message ***'
+   * console.log(newErrors[0].date) // `Date` instance
+   * ```
+   */
+  readonly transformArgs?: ParseOptions['transformArgs']
+
+  /**
+   * During parsing, transform each `Error` instance.
+   *
+   * `errorInstance` is the error after parsing. It must be directly mutated.
+   *
+   * `errorObject` is the error before parsing.
+   *
+   * @example
+   * ```js
+   * const errors = [new ExampleError('message secret')]
+   * errors[0].date = new Date()
+   *
+   * const errorObjects = BaseError.serialize(errors, {
+   *   loose: true,
+   *   // Serialize `Date` instances as strings
+   *   transformObject: (errorObject) => {
+   *     errorObject.date = errorObject.date.toString()
+   *   },
+   * })
+   * console.log(errorObjects[0].date) // Date string
+   *
+   * const newErrors = BaseError.parse(errorObjects, {
+   *   loose: true,
+   *   // Transform error message
+   *   transformArgs: (constructorArgs) => {
+   *     constructorArgs[0] = constructorArgs[0].replace('secret', '***')
+   *   },
+   *   // Parse date strings as `Date` instances
+   *   transformInstance: (error) => {
+   *     error.date = new Date(error.date)
+   *   },
+   * })
+   * console.log(newErrors[0].message) // 'message ***'
+   * console.log(newErrors[0].date) // `Date` instance
+   * ```
+   */
+  readonly transformInstance?: ParseOptions['transformInstance']
 }
 
 /**

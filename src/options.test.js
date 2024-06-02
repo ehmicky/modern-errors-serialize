@@ -3,13 +3,23 @@ import { each } from 'test-each'
 
 import { BaseError } from './helpers/main.test.js'
 
-each([true, { loose: 'true' }, { shallow: 'true' }], ({ title }, options) => {
-  test(`Options are validated | ${title}`, (t) => {
-    t.throws(
-      BaseError.subclass.bind(undefined, 'TestError', { serialize: options }),
-    )
-  })
-})
+each(
+  [
+    true,
+    { loose: 'true' },
+    { shallow: 'true' },
+    { transformObject: true },
+    { transformArgs: true },
+    { transformInstance: true },
+  ],
+  ({ title }, options) => {
+    test(`Options are validated | ${title}`, (t) => {
+      t.throws(
+        BaseError.subclass.bind(undefined, 'TestError', { serialize: options }),
+      )
+    })
+  },
+)
 
 test('Empty objects are options when serializing', (t) => {
   t.is(BaseError.serialize({}).message, '')

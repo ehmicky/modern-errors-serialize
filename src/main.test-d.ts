@@ -37,12 +37,31 @@ new BaseError('', { serialize: { loose: 'true' } })
 BaseError.serialize(error, { loose: true })
 // @ts-expect-error
 BaseError.serialize(error, { loose: 'true' })
+BaseError.serialize(error, {
+  transformInstance: (errorArg: Error, errorObjectArg: ErrorObject) => {},
+})
+// @ts-expect-error
+BaseError.serialize(error, { transformInstance: true })
 error.toJSON({ loose: true })
 // @ts-expect-error
 error.toJSON({ loose: 'true' })
 BaseError.parse(errorObject, { loose: true })
 // @ts-expect-error
 BaseError.parse(errorObject, { loose: 'true' })
+BaseError.parse(errorObject, {
+  transformArgs: (
+    constructorArgs: unknown[],
+    errorObjectArg: ErrorObject,
+    ErrorClass: new (message: string) => Error,
+  ) => {},
+})
+// @ts-expect-error
+BaseError.parse(errorObject, { transformArgs: true })
+BaseError.parse(errorObject, {
+  transformObject: (errorObjectArg: ErrorObject, errorArg: Error) => {},
+})
+// @ts-expect-error
+BaseError.parse(errorObject, { transformObject: true })
 
 expectAssignable<Options>({})
 expectNotAssignable<Options>(true)

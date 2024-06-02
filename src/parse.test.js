@@ -9,6 +9,8 @@ import {
   nativeErrorObject,
   PluginError,
   pluginErrorObject,
+  PluginChildError,
+  pluginChildErrorObject,
   nonErrorObjects,
   InvalidError,
 } from './helpers/main.test.js'
@@ -48,6 +50,43 @@ test('ErrorClass.parse() keeps plugin options deeply', (t) => {
     cause: pluginErrorObject,
   })
   t.true(new PluginError('', { cause }).options)
+})
+
+test('ErrorClass.parse() keeps plugin options when ErrorClass is a parent class', (t) => {
+  const cause = PluginError.parse(pluginChildErrorObject)
+  t.false('pluginsOpts' in cause)
+  t.true(new PluginError('', { cause }).options)
+})
+
+test('ErrorClass.parse() does not keep plugin options when ErrorClass is a subclass', (t) => {
+  const cause = PluginChildError.parse(pluginErrorObject)
+  t.false('pluginsOpts' in cause)
+  t.false('options' in new PluginError('', { cause }))
+})
+
+each([['test'], ['test', {}]], ({ title }, constructorArgs) => {
+  test(`ErrorClass.parse() keeps plugin options with constructorArgs and no second argument | ${title}`, (t) => {
+    const cause = PluginError.parse({
+      ...pluginErrorObject,
+      constructorArgs,
+    })
+    t.false('pluginsOpts' in cause)
+    t.true(new PluginError('', { cause }).options)
+    t.is(cause.message, 'test')
+  })
+})
+
+test('ErrorClass.parse() keeps plugin options with constructorArgs and a non-empty second argument', (t) => {
+  const cause = new Error('test')
+  // eslint-disable-next-line fp/no-mutation
+  cause.prop = true
+  const error = PluginError.parse({
+    ...pluginErrorObject,
+    constructorArgs: ['', { cause }],
+  })
+  t.false('pluginsOpts' in error)
+  t.true(new PluginError('', { cause: error }).options)
+  t.true(error.prop)
 })
 
 const deepErrorObject = { ...pluginErrorObject, prop: [baseErrorObject] }
