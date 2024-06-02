@@ -37,15 +37,13 @@
 
 ## Features
 
-- Added [`error.fromJSON()`](README.md#baseerrorfromjsonerrorobject) and
-  [`error.serialize()`](README.md#baseerrorserializevalue)
+- Added `error.fromJSON()` and `error.serialize()`
 
 # 2.2.0
 
 ## Features
 
-- `error.toJSON()` has been renamed to
-  [`BaseError.toJSON(error)`](README.md#baseerrortojsonerror)
+- `error.toJSON()` has been renamed to `BaseError.toJSON(error)`
 
 # 2.1.0
 
