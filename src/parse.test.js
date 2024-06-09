@@ -44,6 +44,14 @@ test('ErrorClass.parse() keeps plugin options', (t) => {
   t.true(new PluginError('', { cause }).options)
 })
 
+test('ErrorClass.parse() does not keep plugin options if excluded', (t) => {
+  const cause = PluginError.parse(pluginErrorObject, {
+    exclude: ['pluginsOpts'],
+  })
+  t.false('pluginsOpts' in cause)
+  t.true('options' in new PluginError('', { cause }))
+})
+
 test('ErrorClass.parse() keeps plugin options deeply', (t) => {
   const cause = PluginError.parse({
     ...pluginErrorObject,
