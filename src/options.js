@@ -16,6 +16,8 @@ const isOptionKey = (key) => OPTIONS_KEYS.has(key)
 const OPTIONS_KEYS = new Set([
   'loose',
   'shallow',
+  'include',
+  'exclude',
   'transformObject',
   'transformArgs',
   'transformInstance',

@@ -12,12 +12,14 @@ export const toJSON = ({ ErrorClass, instancesData, errorInfo, error }) =>
 
 const serializeValue = ({ ErrorClass, instancesData, errorInfo, value }) => {
   const {
-    options: { loose, shallow, transformObject },
+    options: { loose, shallow, include, exclude, transformObject },
   } = errorInfo(value)
   const valueA = applyLoose(value, loose, ErrorClass)
   return serializeToObject(valueA, {
     loose,
     shallow,
+    include,
+    exclude,
     transformObject: applyTransformObject.bind(undefined, {
       instancesData,
       transformObject,

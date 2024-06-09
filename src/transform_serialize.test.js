@@ -3,6 +3,7 @@ import test from 'ava'
 import {
   BaseError,
   baseError,
+  baseErrorObject,
   PluginError,
   pluginError,
   pluginErrorOpts,
@@ -35,4 +36,17 @@ test('Handle unsafe "transformObject"', (t) => {
     },
   })
   t.deepEqual(pluginsOpts, pluginErrorOpts)
+})
+
+test('Can use "include" option', (t) => {
+  t.deepEqual(BaseError.serialize(baseError, { include: ['message'] }), {
+    message: baseErrorObject.message,
+  })
+})
+
+test('Can use "exclude" option', (t) => {
+  t.deepEqual(
+    BaseError.serialize(baseError, { exclude: ['name', 'stack', 'one'] }),
+    { message: baseErrorObject.message },
+  )
 })

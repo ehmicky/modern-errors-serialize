@@ -8,6 +8,8 @@ each(
     true,
     { loose: 'true' },
     { shallow: 'true' },
+    { include: true },
+    { exclude: true },
     { transformObject: true },
     { transformArgs: true },
     { transformInstance: true },

@@ -63,6 +63,13 @@ BaseError.parse(errorObject, {
 // @ts-expect-error
 BaseError.parse(errorObject, { transformObject: true })
 
+BaseError.serialize(error, { include: ['prop'] })
+// @ts-expect-error
+BaseError.serialize(error, { include: true })
+BaseError.serialize(error, { exclude: ['prop'] })
+// @ts-expect-error
+BaseError.serialize(error, { exclude: true })
+
 expectAssignable<Options>({})
 expectNotAssignable<Options>(true)
 expectNotAssignable<Options>({ unknown: true })

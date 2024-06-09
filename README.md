@@ -166,6 +166,28 @@ BaseError.parse('example') // BaseError
 BaseError.parse('example', { loose: true }) // 'example'
 ```
 
+#### include
+
+_Type_: `string[]`
+
+During [serialization](#baseerrorserializeerror), only pick
+[specific properties](#omit-additional-error-properties).
+
+```js
+BaseError.serialize(error, { include: ['message'] }) // { message: 'example' }
+```
+
+#### exclude
+
+_Type_: `string[]`
+
+During [serialization](#baseerrorserializeerror), omit
+[specific properties](#omit-stack-traces).
+
+```js
+BaseError.serialize(error, { exclude: ['stack'] }) // { name: 'Error', message: 'example' }
+```
+
 ### transformObject(errorObject, errorInstance)
 
 _Type_: `(errorObject, errorInstance) => void`
@@ -293,6 +315,33 @@ const newDeepArray = JSON.parse(jsonString)
 const newError = BaseError.parse(newDeepArray, { loose: true })[1].error
 // ExampleError: message
 //     at ...
+```
+
+## Omit additional error properties
+
+```js
+const ExampleError = BaseError.subclass('ExampleError', {
+  serialize: { include: ['name', 'message', 'stack'] },
+})
+const error = new ExampleError('example')
+error.prop = true
+
+const errorObject = ExampleError.serialize(error)
+console.log(errorObject.prop) // undefined
+console.log(errorObject) // { name: 'Error', message: 'example', stack: '...' }
+```
+
+## Omit stack traces
+
+```js
+const ExampleError = BaseError.subclass('ExampleError', {
+  serialize: { exclude: ['stack'] },
+})
+const error = new ExampleError('example')
+
+const errorObject = ExampleError.serialize(error)
+console.log(errorObject.stack) // undefined
+console.log(errorObject) // { name: 'Error', message: 'example' }
 ```
 
 ## Transforming

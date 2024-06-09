@@ -2,6 +2,10 @@
 
 ## Features
 
+- Add the [`include`](README.md#include) and [`exclude`](README.md#exclude)
+  options to pick/omit specific properties. For example, this can be used to
+  omit [error additional properties](README.md#omit-additional-error-properties)
+  or [stack trace](README.md#omit-stack-traces).
 - Add the
   [`transformObject(errorObject)`](README.md#transformobjecterrorobject-errorinstance)
   option to transform the error plain object during serialization

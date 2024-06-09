@@ -51,6 +51,51 @@ export interface Options {
   readonly shallow?: boolean
 
   /**
+   * During serialization, only pick specific properties.
+   *
+   * @example
+   * ```js
+   * BaseError.serialize(error, { include: ['message'] }) // { message: 'example' }
+   * ```
+   *
+   * @example
+   * ```js
+   * const ExampleError = BaseError.subclass('ExampleError', {
+   *   serialize: { include: ['name', 'message', 'stack'] },
+   * })
+   * const error = new ExampleError('example')
+   * error.prop = true
+   *
+   * const errorObject = ExampleError.serialize(error)
+   * console.log(errorObject.prop) // undefined
+   * console.log(errorObject) // { name: 'Error', message: 'example', stack: '...' }
+   * ```
+   */
+  readonly include?: SerializeOptions['include']
+
+  /**
+   * During serialization, omit specific properties.
+   *
+   * @example
+   * ```js
+   * BaseError.serialize(error, { exclude: ['stack'] }) // { name: 'Error', message: 'example' }
+   * ```
+   *
+   * @example
+   * ```js
+   * const ExampleError = BaseError.subclass('ExampleError', {
+   *   serialize: { exclude: ['stack'] },
+   * })
+   * const error = new ExampleError('example')
+   *
+   * const errorObject = ExampleError.serialize(error)
+   * console.log(errorObject.stack) // undefined
+   * console.log(errorObject) // { name: 'Error', message: 'example' }
+   * ```
+   */
+  readonly exclude?: SerializeOptions['exclude']
+
+  /**
    * During serialization, transform each error plain object.
    *
    * `errorObject` is the error after serialization. It must be directly mutated.
