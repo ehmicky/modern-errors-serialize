@@ -21,9 +21,19 @@
         "ideas",
         "doc"
       ]
+    },
+    {
+      "login": "benkroeger",
+      "name": "Benjamin Kroeger",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7782055?v=4",
+      "profile": "https://vegardit.com",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
   "skipCi": true,
-  "commitConvention": "none"
+  "commitConvention": "none",
+  "commitType": "docs"
 }
