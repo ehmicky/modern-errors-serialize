@@ -5,14 +5,14 @@ import {
   BaseError,
   baseError,
   baseErrorObject,
+  InvalidError,
   nativeError,
   nativeErrorObject,
-  PluginError,
-  pluginErrorObject,
+  nonErrorObjects,
   PluginChildError,
   pluginChildErrorObject,
-  nonErrorObjects,
-  InvalidError,
+  PluginError,
+  pluginErrorObject,
 } from './helpers/main.test.js'
 
 test('ErrorClass.parse() parses error plain objects', (t) => {

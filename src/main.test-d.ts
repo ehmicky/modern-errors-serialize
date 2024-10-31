@@ -1,5 +1,5 @@
 import ModernError, { type ErrorInstance } from 'modern-errors'
-import { expectType, expectAssignable, expectNotAssignable } from 'tsd'
+import { expectAssignable, expectNotAssignable, expectType } from 'tsd'
 
 import modernErrorsSerialize, {
   type ErrorObject,

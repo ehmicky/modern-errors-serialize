@@ -1,9 +1,9 @@
 import type {
   ErrorObject,
-  SerializeOptions,
   ParseOptions,
+  SerializeOptions,
 } from 'error-serializer'
-import type { Info, ErrorInstance } from 'modern-errors'
+import type { ErrorInstance, Info } from 'modern-errors'
 
 export type { ErrorObject }
 
