@@ -63,6 +63,7 @@ const parsePluginsOpts = ({
   const argsIndex = constructorArgs.findLastIndex(isPlainObject)
 
   if (argsIndex === -1) {
+    // eslint-disable-next-line fp/no-mutating-methods
     constructorArgs.push(pluginsOpts)
   } else {
     // eslint-disable-next-line fp/no-mutation, no-param-reassign
