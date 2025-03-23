@@ -54,7 +54,7 @@
     "lib": "src"
   },
   "dependencies": {
-    "error-serializer": "^8.0.0",
+    "error-serializer": "^8.0.1",
     "is-plain-obj": "^4.1.0"
   },
   "devDependencies": {
