@@ -450,6 +450,8 @@ console.log(newError.prop) // true
   a simple, stable, consistent way
 - [`modern-errors-cli`](https://github.com/ehmicky/modern-errors-cli): Handle
   errors in CLI modules
+- [`modern-errors-beautiful`](https://github.com/ehmicky/modern-errors-beautiful):
+  Prettify errors messages and stacks
 - [`modern-errors-process`](https://github.com/ehmicky/modern-errors-process):
   Handle process errors
 - [`modern-errors-bugs`](https://github.com/ehmicky/modern-errors-bugs): Print
